@@ -5,13 +5,9 @@ import { fetchMediaById, fetchCommentsByMediaId } from "@/lib/api-backend";
 import type { MediaItem } from "@/lib/media-service";
 import type { Comment } from "@/lib/api-backend";
 
-// Usa esta interfaz estándar que Next.js 15 espera:
-interface PageProps {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
-
-export default async function MediaDetailPage({ params }: PageProps) {
+// Usamos props sin tipado estricto (any) para evitar error de tipo PageProps en Next.js 15
+export default async function MediaDetailPage(props: any) {
+  const { params } = props;
   const { id } = params;
 
   const media: MediaItem | null = await fetchMediaById(id);
