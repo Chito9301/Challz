@@ -1,4 +1,4 @@
-// media-service.ts
+// lib/media-service.ts
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 import { getToken } from "./api-backend";
@@ -129,4 +129,34 @@ export async function fetchMediaById(mediaId: string): Promise<MediaItem | null>
     ...media,
     mediaUrl: media.mediaUrl || media.url,
   };
+}
+
+/**
+ * Sube un archivo de media (imagen, video, audio...) a Cloudinary.
+ * Puede usarse desde el frontend directamente o llamar a un endpoint backend que procese la subida.
+ * @param file Archivo a subir
+ * @returns string URL pública del archivo en Cloudinary
+ */
+export async function uploadMedia(file: File): Promise<string> {
+  if (!file) throw new Error("Archivo no proporcionado");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "");
+  formData.append("folder", "retos");
+
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  if (!cloudName) throw new Error("Falta configurar NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME");
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error("Error al subir archivo a Cloudinary");
+  }
+
+  const data = await res.json();
+  return data.secure_url;
 }
