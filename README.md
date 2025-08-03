@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./favicon.ico.jpg" alt="Challz Logo" width="200"/>
+  <img src="./frontend/favicon.ico.jpg" alt="Challz Logo" width="200"/>
 </p>
 
 # Challz
