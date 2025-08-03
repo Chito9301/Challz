@@ -34,13 +34,25 @@ interface ClientMediaDetailProps {
   mediaId: string;
 }
 
+/**
+ * Definición del tipo User, para que TS reconozca las propiedades usadas
+ * Ajusta aquí según el tipo real que use tu contexto o autenticación
+ */
+interface User {
+  id: string;
+  username?: string;
+  photoURL?: string;
+  // Puedes agregar más campos necesarios
+}
+
 export default function ClientMediaDetail({
   initialMedia,
   initialComments,
   mediaId,
 }: ClientMediaDetailProps) {
   // Obtener usuario actual y estado de autenticación desde contexto
-  const { user } = useAuth();
+  // Hacemos un type assertion para que TS reconozca el tipo User
+  const { user } = useAuth() as { user: User | null };
 
   const router = useRouter();
 
@@ -50,9 +62,7 @@ export default function ClientMediaDetail({
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  /**
-   * Función que maneja cuando un usuario da "like"
-   */
+  /** Función para manejar "Me gusta" */
   const handleLike = async () => {
     if (!user) {
       router.push("/auth/login");
@@ -70,16 +80,13 @@ export default function ClientMediaDetail({
     }
   };
 
-  /**
-   * Función para agregar un nuevo comentario
-   */
+  /** Función para agregar un nuevo comentario */
   const handleAddComment = async () => {
     if (!user || !commentText.trim() || !media) return;
 
     try {
       setSubmitting(true);
 
-      // Cambio aquí: usar user.id en vez de user.uid para evitar error de tipo
       const newComment = await postComment(media.id, {
         userId: user.id,
         username: user.username || "Usuario",
@@ -97,14 +104,13 @@ export default function ClientMediaDetail({
       setCommentText("");
     } catch (error) {
       console.error("Error adding comment:", error);
+      alert(`Error al enviar comentario: ${error instanceof Error ? error.message : error}`);
     } finally {
       setSubmitting(false);
     }
   };
 
-  /**
-   * Formateo simple para mostrar tiempo relativo de comentarios
-   */
+  /** Formateo simple para mostrar tiempo relativo */
   const formatTimestamp = (isoDate: string) => {
     const now = new Date();
     const commentDate = new Date(isoDate);
@@ -116,13 +122,14 @@ export default function ClientMediaDetail({
     return `${Math.floor(diffInSeconds / 86400)}d`;
   };
 
+  // Muestra de UI mientras carga (puedes expandirlo o eliminarlo si no lo usas)
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen bg-black text-white">
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
           <div className="flex items-center gap-2">
             <Link href="/">
-              <Button variant="ghost" size="icon" className="text-zinc-400">
+              <Button variant="ghost" size="icon" className="text-zinc-400" aria-label="Volver al inicio">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
@@ -149,7 +156,7 @@ export default function ClientMediaDetail({
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
           <div className="flex items-center gap-2">
             <Link href="/">
-              <Button variant="ghost" size="icon" className="text-zinc-400">
+              <Button variant="ghost" size="icon" className="text-zinc-400" aria-label="Volver al inicio">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
@@ -170,6 +177,7 @@ export default function ClientMediaDetail({
       </div>
     );
   }
+
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
@@ -335,4 +343,3 @@ export default function ClientMediaDetail({
     </div>
   );
 }
-
