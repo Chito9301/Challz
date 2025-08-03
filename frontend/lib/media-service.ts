@@ -45,7 +45,6 @@ export async function getUserMedia(userId: string): Promise<MediaItem[]> {
     throw new Error(errorMsg);
   }
 
-  // Mapea cada medio para asegurar que mediaUrl esté presente
   const medias: MediaItem[] = await res.json();
   return medias.map((media) => ({
     ...media,
@@ -54,11 +53,26 @@ export async function getUserMedia(userId: string): Promise<MediaItem[]> {
 }
 
 /**
- * Obtiene la lista de medios trending (populares)
+ * Obtiene la lista de medios trending (populares), opcionalmente filtrando por orden y límite.
+ * @param orderBy Campo para ordenar (por ejemplo, "views", "likes")
+ * @param limit Cantidad máxima de resultados
  * @returns Array de objetos MediaItem
  */
-export async function getTrendingMedia(): Promise<MediaItem[]> {
-  const res = await fetch(`${API_URL}/media/trending`, {
+export async function getTrendingMedia(
+  orderBy?: string,
+  limit?: number
+): Promise<MediaItem[]> {
+  let url = `${API_URL}/media/trending`;
+  const params = new URLSearchParams();
+
+  if (orderBy) params.append("orderBy", orderBy);
+  if (limit) params.append("limit", limit.toString());
+
+  if (params.toString()) {
+    url += `?${params.toString()}`;
+  }
+
+  const res = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
