@@ -57,20 +57,29 @@ export async function apiFetch(
     let errorMsg = "Error desconocido";
     try {
       const data = await res.json();
-      // El backend debería responder con { error: "...", message: "..." } idealmente
       errorMsg = data.error || data.message || errorMsg;
     } catch {
-      // La respuesta no pudo interpretarse como JSON, dejamos mensaje genérico
+      // No JSON válido en error
     }
     throw new Error(errorMsg);
   }
 
-  // Código 204 significa "No Content"
   if (res.status === 204) {
     return null;
   }
 
   return res.json();
+}
+
+// --- Tipos exportados ---
+
+export interface Comment {
+  id: string;
+  userId: string;
+  username: string;
+  userPhotoURL?: string;
+  text: string;
+  createdAt: string;
 }
 
 // --- Funciones específicas para endpoints comunes ---
