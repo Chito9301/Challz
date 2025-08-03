@@ -6,11 +6,28 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 import { getToken } from "./api-backend";
 
 /**
+ * Definición del tipo MediaItem que representa un medio con sus propiedades
+ */
+export type MediaItem = {
+  id: string;
+  title: string;
+  description?: string;   // Opcional
+  url: string;
+  userId: string;
+  createdAt: string;     // fecha en formato string ISO
+  updatedAt?: string;
+  views: number;
+  likes: number;
+  comments: number;
+  // Agrega aquí más campos que tu backend entregue, si los hay
+};
+
+/**
  * Obtiene la lista de medios de un usuario público (puede ser autenticado o no)
  * @param userId ID del usuario al que consultar los medios
- * @returns Array de objetos media
+ * @returns Array de objetos MediaItem
  */
-export async function getUserMedia(userId: string) {
+export async function getUserMedia(userId: string): Promise<MediaItem[]> {
   // Este endpoint suele no requerir autenticación
   const res = await fetch(`${API_URL}/users/${userId}/media`, {
     method: "GET",
@@ -33,9 +50,9 @@ export async function getUserMedia(userId: string) {
 
 /**
  * Obtiene la lista de medios trending (populares)
- * @returns Array de objetos media
+ * @returns Array de objetos MediaItem
  */
-export async function getTrendingMedia() {
+export async function getTrendingMedia(): Promise<MediaItem[]> {
   const res = await fetch(`${API_URL}/media/trending`, {
     method: "GET",
     headers: { "Content-Type": "application/json" }
@@ -58,7 +75,7 @@ export async function getTrendingMedia() {
  * @param mediaId string - ID del media
  * @param stat "views" | "likes" | "comments"
  */
-export async function incrementMediaStats(mediaId: string, stat: "views" | "likes" | "comments") {
+export async function incrementMediaStats(mediaId: string, stat: "views" | "likes" | "comments"): Promise<void> {
   const res = await fetch(`${API_URL}/media/${mediaId}/increment`, {
     method: "POST",
     headers: {
