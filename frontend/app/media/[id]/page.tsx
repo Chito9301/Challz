@@ -5,15 +5,23 @@ import { fetchMediaById, fetchCommentsByMediaId } from "@/lib/api-backend";
 import type { MediaItem } from "@/lib/media-service";
 import type { Comment } from "@/lib/api-backend";
 
-type Params = { params: { id: string } };
+// Usa esta interfaz estándar que Next.js 15 espera:
+interface PageProps {
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
 
-export default async function MediaDetailPage({ params }: Params) {
+export default async function MediaDetailPage({ params }: PageProps) {
   const { id } = params;
 
   const media: MediaItem | null = await fetchMediaById(id);
+
   if (!media) {
-    // Aquí puedes usar la página 404 o redirección
-    return <div className="min-h-screen flex items-center justify-center text-white bg-black">Contenido no encontrado</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-black">
+        Contenido no encontrado
+      </div>
+    );
   }
 
   const comments: Comment[] = await fetchCommentsByMediaId(id);
