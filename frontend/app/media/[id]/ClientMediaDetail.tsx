@@ -34,35 +34,36 @@ interface ClientMediaDetailProps {
   mediaId: string;
 }
 
-export default function ClientMediaDetail({ initialMedia, initialComments, mediaId }: ClientMediaDetailProps) {
+export default function ClientMediaDetail({
+  initialMedia,
+  initialComments,
+  mediaId,
+}: ClientMediaDetailProps) {
   // Obtener usuario actual y estado de autenticación desde contexto
   const { user } = useAuth();
 
-  // Router para navegar programáticamente (por ejemplo, a login)
   const router = useRouter();
 
-  // Estado local para media, comentarios, texto del comentario nuevo, y flags de carga/envío
   const [media, setMedia] = useState<MediaItem | null>(initialMedia);
   const [comments, setComments] = useState<CommentType[]>(initialComments);
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false); // Para estados de carga, si los implementas
+  const [loading, setLoading] = useState(false);
 
   /**
    * Función que maneja cuando un usuario da "like"
    */
   const handleLike = async () => {
     if (!user) {
-      // Si no está autenticado, redirige a login
       router.push("/auth/login");
       return;
     }
     if (media) {
       try {
-        // Incrementar estadística de likes en backend
         await incrementMediaStats(media.id, "likes");
-        // Actualizar estado local para reflejar el cambio en UI
-        setMedia((prev) => (prev ? { ...prev, likes: prev.likes + 1 } : null));
+        setMedia((prev) =>
+          prev ? { ...prev, likes: prev.likes + 1 } : null
+        );
       } catch (error) {
         console.error("Error liking media:", error);
       }
@@ -76,28 +77,28 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
     if (!user || !commentText.trim() || !media) return;
 
     try {
-      setSubmitting(true); // Mostrar indicador de envío
+      setSubmitting(true);
 
-      // Llamar a la API para crear comentario nuevo
+      // Cambio aquí: usar user.id en vez de user.uid para evitar error de tipo
       const newComment = await postComment(media.id, {
-        userId: user.uid,
+        userId: user.id,
         username: user.username || "Usuario",
         userPhotoURL: user.photoURL || "",
         text: commentText.trim(),
         createdAt: new Date().toISOString(),
       });
 
-      // Incrementar contador de comentarios en backend
       await incrementMediaStats(media.id, "comments");
 
-      // Actualizar lista de comentarios local y contador en media
       setComments((prev) => [newComment, ...prev]);
-      setMedia((prev) => (prev ? { ...prev, comments: prev.comments + 1 } : null));
-      setCommentText(""); // Limpiar input
+      setMedia((prev) =>
+        prev ? { ...prev, comments: prev.comments + 1 } : null
+      );
+      setCommentText("");
     } catch (error) {
       console.error("Error adding comment:", error);
     } finally {
-      setSubmitting(false); // Ocultar indicador de envío
+      setSubmitting(false);
     }
   };
 
@@ -115,7 +116,6 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
     return `${Math.floor(diffInSeconds / 86400)}d`;
   };
 
-  // UI mientras carga, puedes expandir o eliminar según implementación específica
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen bg-black text-white">
@@ -143,7 +143,6 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
     );
   }
 
-  // UI si no se encontró el media
   if (!media) {
     return (
       <div className="flex flex-col min-h-screen bg-black text-white">
@@ -172,10 +171,8 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
     );
   }
 
-  // UI principal con todo el contenido
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
-      {/* Cabecera fija con título y navegación */}
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
         <div className="flex items-center gap-2">
           <Link href="/">
@@ -190,10 +187,8 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
         </Button>
       </header>
 
-      {/* Área principal con media, estadísticas, usuario y comentarios */}
       <main className="flex-1 pt-16 pb-20">
         <div className="relative h-[calc(100vh-16rem)] bg-zinc-900">
-          {/* Renderizado condicional según tipo de media */}
           {media.type === "image" ? (
             <Image src={media.mediaUrl || "/placeholder.svg"} alt={media.title} fill className="object-contain" priority />
           ) : media.type === "video" ? (
@@ -208,7 +203,6 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
             </div>
           )}
 
-          {/* Botones para likes, comentarios y compartir */}
           <div className="absolute right-4 top-4 z-10 flex flex-col items-center gap-6">
             <div className="flex flex-col items-center">
               <Button
@@ -237,7 +231,6 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
           </div>
         </div>
 
-        {/* Información del usuario que posteó el media */}
         <div className="p-4 border-t border-zinc-800">
           <div className="flex items-center gap-3 mb-4">
             <Avatar className="h-10 w-10 border-2 border-purple-500">
@@ -255,7 +248,6 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
 
           <p className="text-sm mb-3">{media.description}</p>
 
-          {/* Hashtags */}
           {media.hashtags && media.hashtags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {media.hashtags.map((tag, index) => (
@@ -266,7 +258,6 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
             </div>
           )}
 
-          {/* Sección de Comentarios */}
           <h3 className="font-medium mb-3">Comentarios ({media.comments})</h3>
           <div className="space-y-4 mb-4">
             {comments.length > 0 ? (
@@ -298,7 +289,6 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
             )}
           </div>
 
-          {/* Formulario para añadir comentario si el usuario está autenticado */}
           {user ? (
             <div className="flex items-center gap-3">
               <Avatar className="h-8 w-8">
@@ -332,7 +322,6 @@ export default function ClientMediaDetail({ initialMedia, initialComments, media
               </div>
             </div>
           ) : (
-            // Mensaje para invitar a autenticarse si no está logueado
             <div className="text-center py-2">
               <Link href="/auth/login">
                 <Button variant="link" className="text-purple-400 hover:text-purple-300">
