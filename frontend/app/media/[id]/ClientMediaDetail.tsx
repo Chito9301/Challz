@@ -36,13 +36,11 @@ interface ClientMediaDetailProps {
 
 /**
  * Definición del tipo User, para que TS reconozca las propiedades usadas
- * Ajusta aquí según el tipo real que use tu contexto o autenticación
  */
 interface User {
   id: string;
   username?: string;
   photoURL?: string;
-  // Puedes agregar más campos necesarios
 }
 
 export default function ClientMediaDetail({
@@ -50,10 +48,7 @@ export default function ClientMediaDetail({
   initialComments,
   mediaId,
 }: ClientMediaDetailProps) {
-  // Obtener usuario actual y estado de autenticación desde contexto
-  // Hacemos un type assertion para que TS reconozca el tipo User
   const { user } = useAuth() as { user: User | null };
-
   const router = useRouter();
 
   const [media, setMedia] = useState<MediaItem | null>(initialMedia);
@@ -62,7 +57,6 @@ export default function ClientMediaDetail({
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  /** Función para manejar "Me gusta" */
   const handleLike = async () => {
     if (!user) {
       router.push("/auth/login");
@@ -71,16 +65,13 @@ export default function ClientMediaDetail({
     if (media) {
       try {
         await incrementMediaStats(media.id, "likes");
-        setMedia((prev) =>
-          prev ? { ...prev, likes: prev.likes + 1 } : null
-        );
+        setMedia((prev) => (prev ? { ...prev, likes: prev.likes + 1 } : null));
       } catch (error) {
         console.error("Error liking media:", error);
       }
     }
   };
 
-  /** Función para agregar un nuevo comentario */
   const handleAddComment = async () => {
     if (!user || !commentText.trim() || !media) return;
 
@@ -98,19 +89,20 @@ export default function ClientMediaDetail({
       await incrementMediaStats(media.id, "comments");
 
       setComments((prev) => [newComment, ...prev]);
-      setMedia((prev) =>
-        prev ? { ...prev, comments: prev.comments + 1 } : null
-      );
+      setMedia((prev) => (prev ? { ...prev, comments: prev.comments + 1 } : null));
       setCommentText("");
     } catch (error) {
       console.error("Error adding comment:", error);
-      alert(`Error al enviar comentario: ${error instanceof Error ? error.message : error}`);
+      alert(
+        `Error al enviar comentario: ${
+          error instanceof Error ? error.message : error
+        }`
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  /** Formateo simple para mostrar tiempo relativo */
   const formatTimestamp = (isoDate: string) => {
     const now = new Date();
     const commentDate = new Date(isoDate);
@@ -122,14 +114,18 @@ export default function ClientMediaDetail({
     return `${Math.floor(diffInSeconds / 86400)}d`;
   };
 
-  // Muestra de UI mientras carga (puedes expandirlo o eliminarlo si no lo usas)
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen bg-black text-white">
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
           <div className="flex items-center gap-2">
             <Link href="/">
-              <Button variant="ghost" size="icon" className="text-zinc-400" aria-label="Volver al inicio">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-zinc-400"
+                aria-label="Volver al inicio"
+              >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
@@ -156,7 +152,12 @@ export default function ClientMediaDetail({
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
           <div className="flex items-center gap-2">
             <Link href="/">
-              <Button variant="ghost" size="icon" className="text-zinc-400" aria-label="Volver al inicio">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-zinc-400"
+                aria-label="Volver al inicio"
+              >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
@@ -178,19 +179,28 @@ export default function ClientMediaDetail({
     );
   }
 
-
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
         <div className="flex items-center gap-2">
           <Link href="/">
-            <Button variant="ghost" size="icon" className="text-zinc-400" aria-label="Volver al inicio">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-zinc-400"
+              aria-label="Volver al inicio"
+            >
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
           <h1 className="text-lg font-semibold">{media.title}</h1>
         </div>
-        <Button variant="ghost" size="icon" className="text-zinc-400" aria-label="Más opciones">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-zinc-400"
+          aria-label="Más opciones"
+        >
           <MoreVertical className="h-5 w-5" />
         </Button>
       </header>
@@ -198,9 +208,20 @@ export default function ClientMediaDetail({
       <main className="flex-1 pt-16 pb-20">
         <div className="relative h-[calc(100vh-16rem)] bg-zinc-900">
           {media.type === "image" ? (
-            <Image src={media.mediaUrl || "/placeholder.svg"} alt={media.title} fill className="object-contain" priority />
+            <Image
+              src={media.mediaUrl || "/placeholder.svg"}
+              alt={media.title}
+              fill
+              className="object-contain"
+              priority
+            />
           ) : media.type === "video" ? (
-            <video src={media.mediaUrl} controls autoPlay className="w-full h-full object-contain" />
+            <video
+              src={media.mediaUrl}
+              controls
+              autoPlay
+              className="w-full h-full object-contain"
+            />
           ) : (
             <div className="flex items-center justify-center h-full bg-gradient-to-b from-purple-900/20 to-black">
               <div className="text-center p-4">
@@ -225,13 +246,23 @@ export default function ClientMediaDetail({
               <span className="text-xs mt-1">{media.likes}</span>
             </div>
             <div className="flex flex-col items-center">
-              <Button variant="ghost" size="icon" className="rounded-full bg-black/40 backdrop-blur-md" aria-label="Comentarios">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full bg-black/40 backdrop-blur-md"
+                aria-label="Comentarios"
+              >
                 <MessageCircle className="h-6 w-6" />
               </Button>
               <span className="text-xs mt-1">{media.comments}</span>
             </div>
             <div className="flex flex-col items-center">
-              <Button variant="ghost" size="icon" className="rounded-full bg-black/40 backdrop-blur-md" aria-label="Compartir">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full bg-black/40 backdrop-blur-md"
+                aria-label="Compartir"
+              >
                 <Share2 className="h-6 w-6" />
               </Button>
               <span className="text-xs mt-1">Compartir</span>
@@ -242,14 +273,23 @@ export default function ClientMediaDetail({
         <div className="p-4 border-t border-zinc-800">
           <div className="flex items-center gap-3 mb-4">
             <Avatar className="h-10 w-10 border-2 border-purple-500">
-              <AvatarImage src={media.userPhotoURL || "/placeholder.svg?height=40&width=40"} alt={media.username} />
-              <AvatarFallback>{media.username.charAt(0)}</AvatarFallback>
+              <AvatarImage
+                src={media.userPhotoURL || "/placeholder.svg?height=40&width=40"}
+                alt={media.username}
+              />
+              <AvatarFallback>{media.username?.charAt(0) ?? "U"}</AvatarFallback>
             </Avatar>
             <div>
               <p className="font-semibold">{media.username}</p>
-              {media.challengeTitle && <p className="text-xs text-zinc-400">Reto: {media.challengeTitle}</p>}
+              {media.challengeTitle && (
+                <p className="text-xs text-zinc-400">Reto: {media.challengeTitle}</p>
+              )}
             </div>
-            <Button size="sm" variant="secondary" className="ml-auto text-xs bg-purple-600 hover:bg-purple-700 text-white">
+            <Button
+              size="sm"
+              variant="secondary"
+              className="ml-auto text-xs bg-purple-600 hover:bg-purple-700 text-white"
+            >
               Seguir
             </Button>
           </div>
@@ -259,7 +299,10 @@ export default function ClientMediaDetail({
           {media.hashtags && media.hashtags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {media.hashtags.map((tag, index) => (
-                <Badge key={index} className="bg-zinc-800 hover:bg-zinc-700 text-white border-none text-xs">
+                <Badge
+                  key={index}
+                  className="bg-zinc-800 hover:bg-zinc-700 text-white border-none text-xs"
+                >
                   {tag}
                 </Badge>
               ))}
@@ -272,20 +315,33 @@ export default function ClientMediaDetail({
               comments.map((comment) => (
                 <div key={comment.id} className="flex gap-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={comment.userPhotoURL || `/placeholder.svg?height=32&width=32`} alt={comment.username} />
+                    <AvatarImage
+                      src={comment.userPhotoURL || `/placeholder.svg?height=32&width=32`}
+                      alt={comment.username}
+                    />
                     <AvatarFallback>{comment.username.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium">{comment.username}</p>
-                      <span className="text-xs text-zinc-500">{formatTimestamp(comment.createdAt)}</span>
+                      <span className="text-xs text-zinc-500">
+                        {formatTimestamp(comment.createdAt)}
+                      </span>
                     </div>
                     <p className="text-sm">{comment.text}</p>
                     <div className="flex items-center gap-4 mt-1">
-                      <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-zinc-400 hover:text-zinc-300">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-xs text-zinc-400 hover:text-zinc-300"
+                      >
                         Me gusta
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-zinc-400 hover:text-zinc-300">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-xs text-zinc-400 hover:text-zinc-300"
+                      >
                         Responder
                       </Button>
                     </div>
@@ -293,14 +349,19 @@ export default function ClientMediaDetail({
                 </div>
               ))
             ) : (
-              <p className="text-center text-zinc-400 py-4">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+              <p className="text-center text-zinc-400 py-4">
+                No hay comentarios aún. ¡Sé el primero en comentar!
+              </p>
             )}
           </div>
 
           {user ? (
             <div className="flex items-center gap-3">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={user.photoURL || "/placeholder.svg?height=32&width=32"} alt={user.username || "Usuario"} />
+                <AvatarImage
+                  src={user.photoURL || "/placeholder.svg?height=32&width=32"}
+                  alt={user.username || "Usuario"}
+                />
                 <AvatarFallback>{user.username?.charAt(0) || "U"}</AvatarFallback>
               </Avatar>
               <div className="flex-1 relative">
@@ -325,14 +386,21 @@ export default function ClientMediaDetail({
                   aria-disabled={submitting || !commentText.trim()}
                   aria-label="Publicar comentario"
                 >
-                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : "Publicar"}
+                  {submitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    "Publicar"
+                  )}
                 </Button>
               </div>
             </div>
           ) : (
             <div className="text-center py-2">
               <Link href="/auth/login">
-                <Button variant="link" className="text-purple-400 hover:text-purple-300">
+                <Button
+                  variant="link"
+                  className="text-purple-400 hover:text-purple-300"
+                >
                   Inicia sesión para comentar
                 </Button>
               </Link>
@@ -343,3 +411,4 @@ export default function ClientMediaDetail({
     </div>
   );
 }
+
