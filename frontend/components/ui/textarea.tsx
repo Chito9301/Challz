@@ -17,6 +17,6 @@ const Textarea = React.forwardRef<
     />
   )
 })
-Textarea.displayName = "Textarea"
+Textarea.username = "Textarea"
 
 export { Textarea }

@@ -20,7 +20,7 @@ const InputOTP = React.forwardRef<
     {...props}
   />
 ))
-InputOTP.displayName = "InputOTP"
+InputOTP.username = "InputOTP"
 
 const InputOTPGroup = React.forwardRef<
   React.ElementRef<"div">,
@@ -28,7 +28,7 @@ const InputOTPGroup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn("flex items-center", className)} {...props} />
 ))
-InputOTPGroup.displayName = "InputOTPGroup"
+InputOTPGroup.username = "InputOTPGroup"
 
 const InputOTPSlot = React.forwardRef<
   React.ElementRef<"div">,
@@ -56,7 +56,7 @@ const InputOTPSlot = React.forwardRef<
     </div>
   )
 })
-InputOTPSlot.displayName = "InputOTPSlot"
+InputOTPSlot.username = "InputOTPSlot"
 
 const InputOTPSeparator = React.forwardRef<
   React.ElementRef<"div">,
@@ -66,6 +66,6 @@ const InputOTPSeparator = React.forwardRef<
     <Dot />
   </div>
 ))
-InputOTPSeparator.displayName = "InputOTPSeparator"
+InputOTPSeparator.username = "InputOTPSeparator"
 
 export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator }

@@ -154,7 +154,7 @@ const SidebarProvider = React.forwardRef<
     )
   }
 )
-SidebarProvider.displayName = "SidebarProvider"
+SidebarProvider.username = "SidebarProvider"
 
 const Sidebar = React.forwardRef<
   HTMLDivElement,
@@ -257,7 +257,7 @@ const Sidebar = React.forwardRef<
     )
   }
 )
-Sidebar.displayName = "Sidebar"
+Sidebar.username = "Sidebar"
 
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
@@ -283,7 +283,7 @@ const SidebarTrigger = React.forwardRef<
     </Button>
   )
 })
-SidebarTrigger.displayName = "SidebarTrigger"
+SidebarTrigger.username = "SidebarTrigger"
 
 const SidebarRail = React.forwardRef<
   HTMLButtonElement,
@@ -312,7 +312,7 @@ const SidebarRail = React.forwardRef<
     />
   )
 })
-SidebarRail.displayName = "SidebarRail"
+SidebarRail.username = "SidebarRail"
 
 const SidebarInset = React.forwardRef<
   HTMLDivElement,
@@ -330,7 +330,7 @@ const SidebarInset = React.forwardRef<
     />
   )
 })
-SidebarInset.displayName = "SidebarInset"
+SidebarInset.username = "SidebarInset"
 
 const SidebarInput = React.forwardRef<
   React.ElementRef<typeof Input>,
@@ -348,7 +348,7 @@ const SidebarInput = React.forwardRef<
     />
   )
 })
-SidebarInput.displayName = "SidebarInput"
+SidebarInput.username = "SidebarInput"
 
 const SidebarHeader = React.forwardRef<
   HTMLDivElement,
@@ -363,7 +363,7 @@ const SidebarHeader = React.forwardRef<
     />
   )
 })
-SidebarHeader.displayName = "SidebarHeader"
+SidebarHeader.username = "SidebarHeader"
 
 const SidebarFooter = React.forwardRef<
   HTMLDivElement,
@@ -378,7 +378,7 @@ const SidebarFooter = React.forwardRef<
     />
   )
 })
-SidebarFooter.displayName = "SidebarFooter"
+SidebarFooter.username = "SidebarFooter"
 
 const SidebarSeparator = React.forwardRef<
   React.ElementRef<typeof Separator>,
@@ -393,7 +393,7 @@ const SidebarSeparator = React.forwardRef<
     />
   )
 })
-SidebarSeparator.displayName = "SidebarSeparator"
+SidebarSeparator.username = "SidebarSeparator"
 
 const SidebarContent = React.forwardRef<
   HTMLDivElement,
@@ -411,7 +411,7 @@ const SidebarContent = React.forwardRef<
     />
   )
 })
-SidebarContent.displayName = "SidebarContent"
+SidebarContent.username = "SidebarContent"
 
 const SidebarGroup = React.forwardRef<
   HTMLDivElement,
@@ -426,7 +426,7 @@ const SidebarGroup = React.forwardRef<
     />
   )
 })
-SidebarGroup.displayName = "SidebarGroup"
+SidebarGroup.username = "SidebarGroup"
 
 const SidebarGroupLabel = React.forwardRef<
   HTMLDivElement,
@@ -447,7 +447,7 @@ const SidebarGroupLabel = React.forwardRef<
     />
   )
 })
-SidebarGroupLabel.displayName = "SidebarGroupLabel"
+SidebarGroupLabel.username = "SidebarGroupLabel"
 
 const SidebarGroupAction = React.forwardRef<
   HTMLButtonElement,
@@ -470,7 +470,7 @@ const SidebarGroupAction = React.forwardRef<
     />
   )
 })
-SidebarGroupAction.displayName = "SidebarGroupAction"
+SidebarGroupAction.username = "SidebarGroupAction"
 
 const SidebarGroupContent = React.forwardRef<
   HTMLDivElement,
@@ -483,7 +483,7 @@ const SidebarGroupContent = React.forwardRef<
     {...props}
   />
 ))
-SidebarGroupContent.displayName = "SidebarGroupContent"
+SidebarGroupContent.username = "SidebarGroupContent"
 
 const SidebarMenu = React.forwardRef<
   HTMLUListElement,
@@ -496,7 +496,7 @@ const SidebarMenu = React.forwardRef<
     {...props}
   />
 ))
-SidebarMenu.displayName = "SidebarMenu"
+SidebarMenu.username = "SidebarMenu"
 
 const SidebarMenuItem = React.forwardRef<
   HTMLLIElement,
@@ -509,7 +509,7 @@ const SidebarMenuItem = React.forwardRef<
     {...props}
   />
 ))
-SidebarMenuItem.displayName = "SidebarMenuItem"
+SidebarMenuItem.username = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
   "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
@@ -590,7 +590,7 @@ const SidebarMenuButton = React.forwardRef<
     )
   }
 )
-SidebarMenuButton.displayName = "SidebarMenuButton"
+SidebarMenuButton.username = "SidebarMenuButton"
 
 const SidebarMenuAction = React.forwardRef<
   HTMLButtonElement,
@@ -621,7 +621,7 @@ const SidebarMenuAction = React.forwardRef<
     />
   )
 })
-SidebarMenuAction.displayName = "SidebarMenuAction"
+SidebarMenuAction.username = "SidebarMenuAction"
 
 const SidebarMenuBadge = React.forwardRef<
   HTMLDivElement,
@@ -642,7 +642,7 @@ const SidebarMenuBadge = React.forwardRef<
     {...props}
   />
 ))
-SidebarMenuBadge.displayName = "SidebarMenuBadge"
+SidebarMenuBadge.username = "SidebarMenuBadge"
 
 const SidebarMenuSkeleton = React.forwardRef<
   HTMLDivElement,
@@ -680,7 +680,7 @@ const SidebarMenuSkeleton = React.forwardRef<
     </div>
   )
 })
-SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton"
+SidebarMenuSkeleton.username = "SidebarMenuSkeleton"
 
 const SidebarMenuSub = React.forwardRef<
   HTMLUListElement,
@@ -697,13 +697,13 @@ const SidebarMenuSub = React.forwardRef<
     {...props}
   />
 ))
-SidebarMenuSub.displayName = "SidebarMenuSub"
+SidebarMenuSub.username = "SidebarMenuSub"
 
 const SidebarMenuSubItem = React.forwardRef<
   HTMLLIElement,
   React.ComponentProps<"li">
 >(({ ...props }, ref) => <li ref={ref} {...props} />)
-SidebarMenuSubItem.displayName = "SidebarMenuSubItem"
+SidebarMenuSubItem.username = "SidebarMenuSubItem"
 
 const SidebarMenuSubButton = React.forwardRef<
   HTMLAnchorElement,
@@ -733,7 +733,7 @@ const SidebarMenuSubButton = React.forwardRef<
     />
   )
 })
-SidebarMenuSubButton.displayName = "SidebarMenuSubButton"
+SidebarMenuSubButton.username = "SidebarMenuSubButton"
 
 export {
   Sidebar,

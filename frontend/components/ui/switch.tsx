@@ -33,6 +33,6 @@ const Switch = React.forwardRef<
   </SwitchPrimitives.Root>
 ))
 
-Switch.displayName = SwitchPrimitives.Root.displayName
+Switch.username = SwitchPrimitives.Root.username
 
 export { Switch }

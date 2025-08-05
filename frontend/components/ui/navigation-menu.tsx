@@ -21,7 +21,7 @@ const NavigationMenu = React.forwardRef<
     <NavigationMenuViewport />
   </NavigationMenuPrimitive.Root>
 ))
-NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
+NavigationMenu.username = NavigationMenuPrimitive.Root.username
 
 const NavigationMenuList = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.List>,
@@ -36,7 +36,7 @@ const NavigationMenuList = React.forwardRef<
     {...props}
   />
 ))
-NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
+NavigationMenuList.username = NavigationMenuPrimitive.List.username
 
 const NavigationMenuItem = NavigationMenuPrimitive.Item
 
@@ -60,7 +60,7 @@ const NavigationMenuTrigger = React.forwardRef<
     />
   </NavigationMenuPrimitive.Trigger>
 ))
-NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
+NavigationMenuTrigger.username = NavigationMenuPrimitive.Trigger.username
 
 const NavigationMenuContent = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Content>,
@@ -75,7 +75,7 @@ const NavigationMenuContent = React.forwardRef<
     {...props}
   />
 ))
-NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
+NavigationMenuContent.username = NavigationMenuPrimitive.Content.username
 
 const NavigationMenuLink = NavigationMenuPrimitive.Link
 
@@ -94,8 +94,8 @@ const NavigationMenuViewport = React.forwardRef<
     />
   </div>
 ))
-NavigationMenuViewport.displayName =
-  NavigationMenuPrimitive.Viewport.displayName
+NavigationMenuViewport.username =
+  NavigationMenuPrimitive.Viewport.username
 
 const NavigationMenuIndicator = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Indicator>,
@@ -112,8 +112,8 @@ const NavigationMenuIndicator = React.forwardRef<
     <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
   </NavigationMenuPrimitive.Indicator>
 ))
-NavigationMenuIndicator.displayName =
-  NavigationMenuPrimitive.Indicator.displayName
+NavigationMenuIndicator.username =
+  NavigationMenuPrimitive.Indicator.username
 
 export {
   navigationMenuTriggerStyle,
