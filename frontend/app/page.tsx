@@ -79,6 +79,7 @@ export default function Home() {
   }, [])
 
   const currentMedia = trendingMedia[currentIndex]
+  const usernameFallback = currentMedia?.username ? currentMedia.username.charAt(0) : "?"
 
   const handleSwipeUp = () => {
     if (trendingMedia.length > 0) {
@@ -374,7 +375,7 @@ export default function Home() {
                         src={currentMedia.userPhotoURL || "/placeholder.svg?height=32&width=32"}
                         alt={currentMedia.username}
                       />
-                      <AvatarFallback>{currentMedia.username.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{usernameFallback}</AvatarFallback>
                     </Avatar>
                     <p className="font-medium">{currentMedia.username}</p>
                     <Button
