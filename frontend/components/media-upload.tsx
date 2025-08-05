@@ -73,7 +73,7 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
         .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
         .filter((tag) => tag.length > 1)
 
-      await uploadMedia(file, user.uid, user.displayName || "Usuario", user.photoURL, {
+      await uploadMedia(file, user.uid, user.username || "Usuario", user.photoURL, {
         title,
         description,
         type: mediaType,
