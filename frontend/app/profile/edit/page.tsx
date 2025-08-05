@@ -17,22 +17,39 @@ import ProtectedRoute from "@/components/protected-route"
 
 export default function EditProfilePage() {
   const { user } = useAuth()
-  const [name, setName] = useState(user?.displayName || "")
+
+  // Inicializamos el estado 'name' usando 'user.username' porque en nuestro contexto
+  // user no tiene la propiedad 'displayName'. Esto evita errores de tipos y runtime.
+  // Si en el futuro se cambia el esquema, aquí se debe actualizar esta asignación.
+  const [name, setName] = useState(user?.username || "")
+
+  // Username inicial derivado del email. Si tienes un campo username único, considera usarlo aquí.
   const [username, setUsername] = useState(user?.email?.split("@")[0] || "")
+
+  // Estado para la biografía con un texto por defecto amigable
   const [bio, setBio] = useState("Amante de los retos y la creatividad 🚀")
+
+  // Estado para la imagen de perfil que se puede actualizar
   const [profileImage, setProfileImage] = useState<File | null>(null)
+
+  // Preview de la imagen, para mostrar antes de subir cambios
+  // Inicializamos con user.photoURL si existe
   const [previewImage, setPreviewImage] = useState<string | null>(user?.photoURL || null)
+
+  // Estados para controle de carga, éxito y errores en la actualización
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
+
+  // Referencia al input file oculto para disparar cambio de foto
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Maneja la actualización local de imagen y su preview con FileReader
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setProfileImage(file)
 
-      // Create preview
       const reader = new FileReader()
       reader.onload = (event) => {
         setPreviewImage(event.target?.result as string)
@@ -41,6 +58,8 @@ export default function EditProfilePage() {
     }
   }
 
+  // Simula el envío de formulario para actualizar perfil
+  // Aquí deberías implementar la lógica real con tu backend o Firebase
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -48,15 +67,15 @@ export default function EditProfilePage() {
     setIsLoading(true)
 
     try {
-      // Simulate API call
+      // Simulamos llamada API o función para actualizar perfil
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      // Here you would typically update the user profile
+      // Ejemplo:
       // await updateUserProfile({ name, username, bio, profileImage })
 
       setSuccess(true)
       setTimeout(() => {
-        // Redirect back to profile after success
+        // Redirige al perfil luego de guardar exitosamente
         window.history.back()
       }, 1500)
     } catch (error) {
@@ -69,7 +88,7 @@ export default function EditProfilePage() {
   return (
     <ProtectedRoute>
       <div className="flex flex-col min-h-screen bg-black text-white">
-        {/* Header */}
+        {/* Header con botón para volver y botón para guardar cambios */}
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
           <div className="flex items-center gap-2">
             <Link href="/profile">
@@ -97,9 +116,10 @@ export default function EditProfilePage() {
           </Button>
         </header>
 
-        {/* Main Content */}
+        {/* Contenido principal del formulario de edición */}
         <main className="flex-1 pt-16 pb-4">
           <div className="p-4 max-w-xl mx-auto">
+            {/* Alertas para mostrar errores o éxito */}
             {error && (
               <Alert variant="destructive" className="bg-red-900/20 border-red-900 text-red-300 mb-4">
                 <AlertCircle className="h-4 w-4" />
@@ -115,17 +135,19 @@ export default function EditProfilePage() {
             )}
 
             <form id="edit-profile-form" onSubmit={handleSubmit} className="space-y-6">
-              {/* Profile Image */}
+              {/* Imagen de perfil con preview y botón para cambiar */}
               <div className="flex flex-col items-center space-y-4">
                 <div className="relative">
                   <Avatar className="h-24 w-24 border-4 border-purple-500">
                     <AvatarImage src={previewImage || "/placeholder.svg?height=96&width=96"} alt="Profile" />
-                    <AvatarFallback>{name.charAt(0) || "U"}</AvatarFallback>
+                    {/* Validamos para evitar error si name está vacío */}
+                    <AvatarFallback>{name ? name.charAt(0) : "U"}</AvatarFallback>
                   </Avatar>
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="absolute -bottom-2 -right-2 bg-purple-600 hover:bg-purple-700 rounded-full p-2 transition-colors"
+                    aria-label="Cambiar foto de perfil"
                   >
                     <Camera className="h-4 w-4 text-white" />
                   </button>
@@ -136,13 +158,14 @@ export default function EditProfilePage() {
                   onChange={handleImageChange}
                   accept="image/*"
                   className="hidden"
+                  aria-hidden="true"
                 />
                 <p className="text-sm text-zinc-400 text-center">
                   Toca el ícono de cámara para cambiar tu foto de perfil
                 </p>
               </div>
 
-              {/* Name */}
+              {/* Input para nombre */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm text-zinc-400">
                   Nombre
@@ -158,7 +181,7 @@ export default function EditProfilePage() {
                 />
               </div>
 
-              {/* Username */}
+              {/* Input para username, forzando que inicie con @ */}
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-sm text-zinc-400">
                   Nombre de usuario
@@ -174,7 +197,7 @@ export default function EditProfilePage() {
                 />
               </div>
 
-              {/* Bio */}
+              {/* Textarea para biografía */}
               <div className="space-y-2">
                 <Label htmlFor="bio" className="text-sm text-zinc-400">
                   Biografía
@@ -190,7 +213,7 @@ export default function EditProfilePage() {
                 <p className="text-xs text-zinc-500 text-right">{bio.length}/150</p>
               </div>
 
-              {/* Additional Info */}
+              {/* Información adicional para el usuario */}
               <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
                 <h3 className="font-medium mb-3">Información adicional</h3>
                 <div className="space-y-3 text-sm text-zinc-400">
