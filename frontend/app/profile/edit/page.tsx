@@ -19,7 +19,7 @@ import ProtectedRoute from "@/components/protected-route"
 export default function EditProfilePage() {
   const { user } = useAuth()
 
-  // Usamos username en lugar de displayName para evitar error de tipo
+  // Usamos username en lugar de username para evitar error de tipo
   const [name, setName] = useState(user?.username || "")
 
   // Nombre de usuario inicial derivado de email

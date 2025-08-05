@@ -122,13 +122,13 @@ export default function ProfilePage() {
               <Avatar className="h-20 w-20 border-4 border-purple-500">
                 <AvatarImage
                   src={user?.photoURL || "/placeholder.svg?height=80&width=80"}
-                  alt={user?.displayName || "@user"}
+                  alt={user?.username || "@user"}
                 />
-                <AvatarFallback>{user?.displayName?.charAt(0) || "U"}</AvatarFallback>
+                <AvatarFallback>{user?.username?.charAt(0) || "U"}</AvatarFallback>
               </Avatar>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold">{user?.displayName || "Usuario"}</h2>
+                  <h2 className="text-xl font-bold">{user?.username || "Usuario"}</h2>
                 </div>
                 <p className="text-zinc-400">{user?.email}</p>
                 <p className="text-sm mt-1">Amante de los retos y la creatividad 🚀</p>
