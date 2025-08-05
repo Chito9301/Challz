@@ -19,6 +19,9 @@ import ProtectedRoute from "@/components/protected-route"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSearchParams } from "next/navigation"
 
+// Importa la interfaz User con el campo _id para tipar el user correctamente
+import type { User } from "@/app/types/user"
+
 /**
  * Página de perfil de usuario.
  * 
@@ -35,13 +38,18 @@ import { useSearchParams } from "next/navigation"
 export default function ProfilePage() {
   // Obtenemos el usuario actual desde contexto de autenticación
   const { user } = useAuth()
+
+  // Asignamos tipo explícito a user para que TS reconozca _id y otras propiedades
+  const typedUser = user as User | undefined
+
   // Obtenemos parámetros de búsqueda (query params) para identificar userId del perfil a mostrar
   const searchParams = useSearchParams()
 
   // Extraemos userId del perfil a visualizar desde la URL
   const profileUserId = searchParams.get("userId")
+
   // Determinamos si es el perfil propio comparando con el id del usuario actual (_id para backend Mongoose)
-  const isOwnProfile = !profileUserId || profileUserId === user?._id
+  const isOwnProfile = !profileUserId || profileUserId === typedUser?._id
 
   // Estado para almacenar medios (retos) del usuario perfil
   const [userMedia, setUserMedia] = useState<MediaItem[]>([])
@@ -50,11 +58,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function fetchUserMedia() {
-      if (user) {
+      if (typedUser) {
         try {
           setLoading(true)
           // Obtenemos medios desde backend; si profileUserId está definido, consulta ese id, sino el propio usuario
-          const media = await getUserMedia(profileUserId || user._id)
+          const media = await getUserMedia(profileUserId || typedUser._id)
           setUserMedia(media)
         } catch (error) {
           console.error("Error fetching user media:", error)
@@ -65,7 +73,7 @@ export default function ProfilePage() {
     }
 
     fetchUserMedia()
-  }, [user, profileUserId])
+  }, [typedUser, profileUserId])
 
   // Función para permitir reportar perfil (solo muestra alert)
   const handleReportUser = () => {
@@ -126,16 +134,16 @@ export default function ProfilePage() {
             <div className="flex items-center gap-4 mb-6">
               <Avatar className="h-20 w-20 border-4 border-purple-500">
                 <AvatarImage
-                  src={user?.photoURL || "/placeholder.svg?height=80&width=80"}
-                  alt={user?.username || "@user"}
+                  src={typedUser?.photoURL || "/placeholder.svg?height=80&width=80"}
+                  alt={typedUser?.username || "@user"}
                 />
-                <AvatarFallback>{user?.username?.charAt(0) || "U"}</AvatarFallback>
+                <AvatarFallback>{typedUser?.username?.charAt(0) || "U"}</AvatarFallback>
               </Avatar>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold">{user?.username || "Usuario"}</h2>
+                  <h2 className="text-xl font-bold">{typedUser?.username || "Usuario"}</h2>
                 </div>
-                <p className="text-zinc-400">{user?.email}</p>
+                <p className="text-zinc-400">{typedUser?.email}</p>
                 <p className="text-sm mt-1">Amante de los retos y la creatividad 🚀</p>
               </div>
             </div>
