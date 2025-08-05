@@ -33,14 +33,19 @@ import { useSearchParams } from "next/navigation"
  * Mantiene diseño y colores originales, con lógica tersa y comentarios para colaboradores.
  */
 export default function ProfilePage() {
+  // Obtenemos el usuario actual desde contexto de autenticación
   const { user } = useAuth()
+  // Obtenemos parámetros de búsqueda (query params) para identificar userId del perfil a mostrar
   const searchParams = useSearchParams()
 
-  // Obtenemos userId de perfil a visualizar (consulta en URL)
+  // Extraemos userId del perfil a visualizar desde la URL
   const profileUserId = searchParams.get("userId")
-  const isOwnProfile = !profileUserId || profileUserId === user?.uid
+  // Determinamos si es el perfil propio comparando con el id del usuario actual (_id para backend Mongoose)
+  const isOwnProfile = !profileUserId || profileUserId === user?._id
 
+  // Estado para almacenar medios (retos) del usuario perfil
   const [userMedia, setUserMedia] = useState<MediaItem[]>([])
+  // Estado para controlar carga de datos
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -48,8 +53,8 @@ export default function ProfilePage() {
       if (user) {
         try {
           setLoading(true)
-          // Obtener medios del usuario perfil (propio o seleccionado)
-          const media = await getUserMedia(profileUserId || user.uid)
+          // Obtenemos medios desde backend; si profileUserId está definido, consulta ese id, sino el propio usuario
+          const media = await getUserMedia(profileUserId || user._id)
           setUserMedia(media)
         } catch (error) {
           console.error("Error fetching user media:", error)
@@ -62,18 +67,18 @@ export default function ProfilePage() {
     fetchUserMedia()
   }, [user, profileUserId])
 
-  // Función simple para reportar perfil
+  // Función para permitir reportar perfil (solo muestra alert)
   const handleReportUser = () => {
     if (confirm("¿Quieres reportar este perfil?")) {
       alert("Reporte de perfil enviado. Gracias por ayudarnos a mantener la comunidad segura.")
-      // Aquí podrías implementar lógica real para reportar al backend
+      // Lugar para implementar lógica real de reportes (backend)
     }
   }
 
   return (
     <ProtectedRoute>
       <div className="flex flex-col min-h-screen bg-black text-white">
-        {/* Header fijo */}
+        {/* Header fijo con navegación y acciones según tipo de perfil */}
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
           <div className="flex items-center gap-2">
             <Link href="/">
@@ -114,10 +119,10 @@ export default function ProfilePage() {
           </div>
         </header>
 
-        {/* Contenido principal con paddings para evitar header fijo */}
+        {/* Contenido principal con paddings para evitar que el header fijo lo tape */}
         <main className="flex-1 pt-16 pb-20">
           <div className="p-4">
-            {/* Sección de info usuario */}
+            {/* Sección con avatar y datos básicos del usuario */}
             <div className="flex items-center gap-4 mb-6">
               <Avatar className="h-20 w-20 border-4 border-purple-500">
                 <AvatarImage
@@ -135,7 +140,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Estadísticas sencillas */}
+            {/* Estadísticas simplificadas */}
             <div className="flex justify-between mb-6 text-center">
               <div className="flex-1">
                 <p className="text-xl font-bold">{userMedia.length}</p>
@@ -151,7 +156,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Botones de acción (según sea propio perfil o ajeno) */}
+            {/* Botones de acción según sea perfil propio o ajeno */}
             <div className="flex gap-3 mb-6">
               {isOwnProfile ? (
                 <>
@@ -185,7 +190,7 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Pestañas para diferentes vistas */}
+            {/* Pestañas para visualizar diferentes colecciones de medios */}
             <Tabs defaultValue="challenges" className="w-full">
               <TabsList className="w-full bg-zinc-900 border-b border-zinc-800 rounded-none h-12">
                 <TabsTrigger
