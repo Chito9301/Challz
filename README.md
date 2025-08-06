@@ -4,7 +4,7 @@
 
 # Challz
 
-Challz es una plataforma moderna de retos sociales tipo TikTok, construida con Next.js y un backend personalizado, desplegada fácilmente en Vercel.
+Challz es una plataforma moderna de retos sociales, construida con Next.js y un backend personalizado, desplegada fácilmente en Vercel.
 
 ---
 
