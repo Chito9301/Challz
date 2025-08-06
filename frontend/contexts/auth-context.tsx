@@ -5,17 +5,18 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 /**
  * Tipo que define la estructura del usuario
  */
-interface User {
+export interface User {
   id: string;
   username: string;
   email: string;
-  // Otros campos si los hay
+  photoURL?: string; // Añadido para evitar error en MediaUpload
+  // Puedes agregar otros campos que tu backend envíe aquí
 }
 
 /**
  * Define el tipo completo del contexto de autenticación
  */
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   loading: boolean;          // Carga inicial o solicitud en progreso
   isConfigured: boolean;     // Indica que la carga inicial terminó (user ya está definido o null)
@@ -33,7 +34,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);        // Proceso activo de carga
+  const [loading, setLoading] = useState(true);         // Proceso activo de carga
   const [isConfigured, setIsConfigured] = useState(false); // Proceso inicial finalizado
 
   // Al montar, intenta obtener el usuario actual desde API
@@ -145,4 +146,3 @@ export const useAuth = (): AuthContextType => {
   if (!context) throw new Error("useAuth debe usarse dentro de AuthProvider");
   return context;
 };
-
