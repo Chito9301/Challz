@@ -15,17 +15,17 @@ import { Progress } from "@/components/ui/progress"
  * 
  * Nota importante para Next.js 15:
  * El componente se exporta como async y recibe params como Promise,
- * por eso se debe hacer await para obtener el id parámetro.
+ * por eso se hace await para obtener el id parámetro.
  */
 export default async function RetoPage({ params }: { params: Promise<{ id: string }> }) {
-  // Resolvemos la promesa de params para obtener el id
+  // Desestructuramos 'id' tras resolver la promesa params
   const { id } = await params
 
-  // Puedes usar id en cualquier parte del componente si lo necesitas
+  // Aquí podrías agregar lógica para traer datos reales del reto por ID futuramente, llamando API o base de datos.
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
-      {/* Header */}
+      {/* Header fijo con botón para volver y botón de compartir */}
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
         <div className="flex items-center gap-2">
           <Link href="/">
@@ -40,19 +40,25 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
         </Button>
       </header>
 
-      {/* Main Content */}
+      {/* Contenido principal con padding para evitar el header fijo */}
       <main className="flex-1 pt-16 pb-20">
+        {/* Banner con imagen de fondo y info */}
         <div className="relative h-64 bg-gradient-to-b from-purple-900/20 to-black">
           <Image
             src="/placeholder.svg?height=400&width=800"
             alt="Reto banner"
             fill
             className="object-cover opacity-50"
+            priority // para carga prioritaria del banner
           />
+          {/* Overlay de gradiente para suavizar texto sobre imagen */}
           <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+          {/* Información textual del reto */}
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <Badge className="mb-2 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30">RETO DESTACADO</Badge>
-            <h2 className="text-2xl font-bold mb-1">Crea un video bailando con tu canción favorita de los 90s</h2>
+            <h2 className="text-2xl font-bold mb-1">
+              Crea un video bailando con tu canción favorita de los 90s
+            </h2>
             <div className="flex items-center gap-2 text-sm text-zinc-400">
               <Users className="h-4 w-4" />
               <span>238 participantes</span>
@@ -60,15 +66,23 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
 
+        {/* Sección de contenido debajo del banner */}
         <div className="p-4">
+          {/* Progreso y tiempo restante */}
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-sm text-zinc-400">Tiempo restante</p>
               <p className="font-medium">14 horas</p>
             </div>
-            <Progress value={30} className="w-1/2 h-2 bg-zinc-700" indicatorClassName="bg-purple-500" />
+            {/* Corrección: Elimina 'indicatorClassName' que no existe */}
+            <Progress
+              value={30}
+              className="w-1/2 h-2 bg-zinc-700 [&_[role=progressbar]]:bg-purple-500"
+              aria-label="Progress del reto"
+            />
           </div>
 
+          {/* Descripción del reto */}
           <div className="mb-6">
             <h3 className="font-medium mb-2">Descripción</h3>
             <p className="text-sm text-zinc-400">
@@ -78,6 +92,7 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
             </p>
           </div>
 
+          {/* Hashtags */}
           <div className="flex flex-wrap gap-2 mb-6">
             <Badge className="bg-zinc-800 hover:bg-zinc-700 text-white border-none">#challz</Badge>
             <Badge className="bg-zinc-800 hover:bg-zinc-700 text-white border-none">#baile90s</Badge>
@@ -85,6 +100,7 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
             <Badge className="bg-zinc-800 hover:bg-zinc-700 text-white border-none">#nostalgia</Badge>
           </div>
 
+          {/* Botones para aceptar o guardar reto */}
           <div className="flex gap-4 mb-8">
             <Button className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
               Aceptar Reto
@@ -94,6 +110,7 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
             </Button>
           </div>
 
+          {/* Información del creador */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-medium">Creado por</h3>
@@ -115,6 +132,7 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
             </div>
           </div>
 
+          {/* Pestañas para respuestas y populares */}
           <Tabs defaultValue="responses" className="w-full">
             <TabsList className="w-full bg-zinc-900 border-b border-zinc-800 rounded-none h-12">
               <TabsTrigger
@@ -131,6 +149,7 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
               </TabsTrigger>
             </TabsList>
 
+            {/* Contenido pestaña "Respuestas" */}
             <TabsContent value="responses" className="mt-4">
               <div className="grid grid-cols-2 gap-3">
                 {[1, 2, 3, 4, 5, 6].map((item) => (
@@ -142,6 +161,7 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
                           alt={`Response ${item}`}
                           fill
                           className="object-cover"
+                          priority={item === 1} // para la primera imagen cargar antes
                         />
                         <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/60 rounded-full px-2 py-0.5">
                           <Heart className="h-3 w-3 text-red-400" />
@@ -163,6 +183,7 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
               </div>
             </TabsContent>
 
+            {/* Contenido pestaña "Populares" */}
             <TabsContent value="popular" className="mt-4">
               <div className="grid grid-cols-2 gap-3">
                 {[6, 5, 4, 3, 2, 1].map((item) => (
@@ -200,4 +221,3 @@ export default async function RetoPage({ params }: { params: Promise<{ id: strin
     </div>
   )
 }
-
