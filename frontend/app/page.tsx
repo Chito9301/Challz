@@ -349,10 +349,10 @@ export default function Home() {
               </h2>
               <div className="flex items-center gap-2 mb-3">
                 <Avatar className="h-8 w-8 border-2 border-purple-500">
+                  {/* Removed `priority` prop because AvatarImage does not support it */}
                   <AvatarImage
                     src="/placeholder.svg?height=32&width=32"
                     alt="@challz"
-                    priority
                   />
                   <AvatarFallback>CH</AvatarFallback>
                 </Avatar>
@@ -404,9 +404,9 @@ export default function Home() {
                   <div className="flex items-center gap-2 mb-2">
                     <Avatar className="h-8 w-8 border-2 border-purple-500">
                       <AvatarImage
+                        // Removed `priority` here as well
                         src={currentMedia.userPhotoURL || "/placeholder.svg?height=32&width=32"}
                         alt={currentMedia.username}
-                        priority
                       />
                       <AvatarFallback>{usernameFallback}</AvatarFallback>
                     </Avatar>
@@ -478,37 +478,39 @@ export default function Home() {
           </Button>
 
           {/* Profile Button */}
-          <button onClick={handleProfileClick} type="button" aria-label="Perfil">
-            <Button
-              variant="ghost"
-              className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500"
+          {/* Changed from nested <button><Button></Button></button> to a single Button */}
+          <Button
+            onClick={handleProfileClick}
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500"
+            type="button"
+            aria-label="Perfil"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="text-xs">Perfil</span>
-            </Button>
-          </button>
+              <path
+                d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="text-xs">Perfil</span>
+          </Button>
 
           {/* Create Button */}
           <Button
@@ -576,3 +578,4 @@ export default function Home() {
     </div>
   );
 }
+
