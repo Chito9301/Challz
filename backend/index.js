@@ -10,8 +10,26 @@ const User = require('./models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// Lista de orígenes permitidos para CORS
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://challz-frontend.vercel.app',
+];
+
 const corsOptions = {
-  origin: 'https://reballing.vercel.app', // URL frontend permitida
+  origin: function (origin, callback) {
+    if (!origin) {
+      // Permite peticiones sin origen (Postman, curl, etc.)
+      return callback(null, true);
+    }
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      // Origen permitido
+      callback(null, true);
+    } else {
+      // Origen no permitido
+      callback(new Error(`CORS: El origen ${origin} no está permitido.`));
+    }
+  },
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -19,6 +37,7 @@ const corsOptions = {
 };
 
 const app = express();
+
 app.use(cors(corsOptions));
 app.use(express.json());
 
@@ -226,3 +245,5 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
