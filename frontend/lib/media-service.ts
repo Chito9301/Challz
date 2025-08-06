@@ -1,4 +1,3 @@
-// lib/media-service.ts
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 import { getToken } from "./api-backend";
@@ -9,13 +8,14 @@ import { getToken } from "./api-backend";
 export type MediaItem = {
   id: string;
   title: string;
-  description?: string;   // Opcional
-  url: string;            // URL base
-  mediaUrl?: string;      // URL para renderizado (puede coincidir con url)
+  description?: string;    // Opcional
+  url: string;             // URL base
+  mediaUrl?: string;       // URL para renderizado (puede coincidir con url)
+  thumbnailUrl?: string;   // <--- Propiedad opcional añadida (miniatura)
   userId: string;
-  username?: string;      // Nombre del usuario que subió el media
-  userPhotoURL?: string;  // Foto del usuario
-  createdAt: string;      // ISO string
+  username?: string;       // Nombre del usuario que subió el media
+  userPhotoURL?: string;   // Foto del usuario
+  createdAt: string;       // ISO string
   updatedAt?: string;
   views: number;
   likes: number;
@@ -24,6 +24,7 @@ export type MediaItem = {
   challengeTitle?: string;
   hashtags?: string[];
 };
+
 
 /**
  * Obtiene la lista de medios de un usuario público (puede ser autenticado o no)
