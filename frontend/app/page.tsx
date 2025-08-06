@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 import {
   Heart,
   MessageCircle,
@@ -13,24 +13,24 @@ import {
   TrendingUp,
   Bookmark,
   MessageSquare,
-} from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { AppIcon } from "@/components/app-icon"
-import { useState, useEffect } from "react"
-import { useAuth } from "@/contexts/auth-context"
-import { getTrendingMedia, type MediaItem } from "@/lib/media-service"
-import { useRouter } from "next/navigation"
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { AppIcon } from "@/components/app-icon";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { getTrendingMedia, type MediaItem } from "@/lib/media-service";
+import { useRouter } from "next/navigation";
 
 interface InteractiveButtonProps {
-  icon: React.ElementType
-  count: string | number
-  isActive: boolean
-  onClick: () => void
-  activeColor?: string
+  icon: React.ElementType;
+  count: string | number;
+  isActive: boolean;
+  onClick: () => void;
+  activeColor?: string;
 }
 
 function InteractiveButton({
@@ -45,88 +45,93 @@ function InteractiveButton({
       <Button
         variant="ghost"
         size="icon"
-        className={`rounded-full bg-black/40 backdrop-blur-md h-9 w-9 transition-all duration-200 hover:scale-110 ${isActive ? activeColor : "text-white"}`}
+        className={`rounded-full bg-black/40 backdrop-blur-md h-9 w-9 transition-all duration-200 hover:scale-110 ${
+          isActive ? activeColor : "text-white"
+        }`}
         onClick={onClick}
+        type="button"
+        aria-pressed={isActive ? "true" : "false"}
       >
-        <Icon className="h-4 w-4" />
+        <Icon className="h-4 w-4" aria-hidden="true" />
       </Button>
-      <span className="text-xs mt-1 text-center leading-tight max-w-[50px] truncate">{count}</span>
+      <span
+        className="text-xs mt-1 text-center leading-tight max-w-[50px] truncate"
+        aria-label={typeof count === "number" ? `${count} interactions` : count}
+      >
+        {count}
+      </span>
     </div>
-  )
+  );
 }
 
 export default function Home() {
-  const { user, isConfigured } = useAuth()
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState<"challenge" | "feed">("challenge")
-  const [trendingMedia, setTrendingMedia] = useState<MediaItem[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const { user, isConfigured } = useAuth();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"challenge" | "feed">("challenge");
+  const [trendingMedia, setTrendingMedia] = useState<MediaItem[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
+  // Carga listado de media trending por vistas, máximo 10
   useEffect(() => {
     async function fetchTrendingMedia() {
       try {
-        setLoading(true)
-        const media = await getTrendingMedia("views", 10)
-        setTrendingMedia(media)
+        setLoading(true);
+        const media = await getTrendingMedia("views", 10);
+        setTrendingMedia(media);
       } catch (error) {
-        console.error("Error fetching trending media:", error)
+        console.error("Error fetching trending media:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    fetchTrendingMedia()
-  }, [])
+    fetchTrendingMedia();
+  }, []);
 
-  const currentMedia = trendingMedia[currentIndex]
-  const usernameFallback = currentMedia?.username ? currentMedia.username.charAt(0) : "?"
+  const currentMedia = trendingMedia[currentIndex];
+  const usernameFallback = currentMedia?.username
+    ? currentMedia.username.charAt(0).toUpperCase()
+    : "?";
 
+  // Cambia índice al siguiente contenido trending, con wrap-around
   const handleSwipeUp = () => {
-    if (trendingMedia.length > 0) {
-      setCurrentIndex((prev) => (prev + 1) % trendingMedia.length)
-    }
-  }
+    if (trendingMedia.length > 0)
+      setCurrentIndex((prev) => (prev + 1) % trendingMedia.length);
+  };
 
+  // Cambia índice al previo contenido trending, con wrap-around
   const handleSwipeDown = () => {
-    if (trendingMedia.length > 0) {
-      setCurrentIndex((prev) => (prev - 1 + trendingMedia.length) % trendingMedia.length)
-    }
-  }
+    if (trendingMedia.length > 0)
+      setCurrentIndex((prev) => (prev - 1 + trendingMedia.length) % trendingMedia.length);
+  };
 
+  // Maneja click en botón crear nuevo contenido con control de auth y configuración
   const handleCreateClick = () => {
-    if (!isConfigured) {
-      router.push("/env-setup")
-    } else if (!user) {
-      router.push("/auth/login")
-    } else {
-      router.push("/create")
-    }
-  }
+    if (!isConfigured) router.push("/env-setup");
+    else if (!user) router.push("/auth/login");
+    else router.push("/create");
+  };
 
+  // Maneja click en perfil con control similar
   const handleProfileClick = () => {
-    if (!isConfigured) {
-      router.push("/env-setup")
-    } else if (!user) {
-      router.push("/auth/login")
-    } else {
-      router.push("/profile")
-    }
-  }
+    if (!isConfigured) router.push("/env-setup");
+    else if (!user) router.push("/auth/login");
+    else router.push("/profile");
+  };
 
+  // Click en chat - funcionalidad pendiente
   const handleChatClick = () => {
-    if (!isConfigured) {
-      router.push("/env-setup")
-    } else if (!user) {
-      router.push("/auth/login")
-    } else {
-      console.log("Chat clicked - Opening chat functionality")
-      alert("Función de chat - Por implementar")
+    if (!isConfigured) router.push("/env-setup");
+    else if (!user) router.push("/auth/login");
+    else {
+      console.log("Chat clicked - Opening chat functionality");
+      alert("Función de chat - Por implementar");
     }
-  }
+  };
 
-  // Evitar renderizar contenido dependiente de currentMedia hasta que esté definido
+  // Evitar renderizar contenido dependiente sin data válida
   if (!loading && trendingMedia.length > 0 && !currentMedia) {
-    return null
+    return null;
   }
 
   return (
@@ -144,14 +149,21 @@ export default function Home() {
                 variant="ghost"
                 size="sm"
                 className="text-amber-400 bg-amber-400/10 backdrop-blur-md rounded-full"
+                type="button"
               >
                 Configurar
               </Button>
             </Link>
           )}
           <Link href="/explorar">
-            <Button variant="ghost" size="icon" className="text-white bg-black/30 backdrop-blur-md rounded-full">
-              <Search className="h-5 w-5" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white bg-black/30 backdrop-blur-md rounded-full"
+              type="button"
+              aria-label="Explorar contenido"
+            >
+              <Search className="h-5 w-5" aria-hidden="true" />
             </Button>
           </Link>
         </div>
@@ -172,28 +184,38 @@ export default function Home() {
       )}
 
       {/* Tab Selector */}
-      <div className={`fixed ${!isConfigured ? "top-28" : "top-16"} left-0 right-0 z-50 flex justify-center`}>
+      <div
+        className={`fixed ${!isConfigured ? "top-28" : "top-16"} left-0 right-0 z-50 flex justify-center`}
+      >
         <div className="flex bg-black/40 backdrop-blur-md rounded-full p-1">
           <button
+            type="button"
             onClick={() => setActiveTab("challenge")}
             className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-              activeTab === "challenge" ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white" : "text-zinc-400"
+              activeTab === "challenge"
+                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                : "text-zinc-400"
             }`}
+            aria-pressed={activeTab === "challenge"}
           >
             Reto Diario
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("feed")}
             className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-              activeTab === "feed" ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white" : "text-zinc-400"
+              activeTab === "feed"
+                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                : "text-zinc-400"
             }`}
+            aria-pressed={activeTab === "feed"}
           >
             Feed Social
           </button>
         </div>
       </div>
 
-      {/* Main Content - TikTok Style - AJUSTADO PADDING BOTTOM */}
+      {/* Main Content - TikTok Style */}
       <main className="flex-1 relative pb-24" onClick={handleSwipeUp}>
         {/* Full Screen Video Background */}
         <div className="absolute inset-0 bg-zinc-900">
@@ -204,7 +226,7 @@ export default function Home() {
                   <AppIcon size={64} />
                 </div>
                 <p className="text-zinc-400">
-                  {!isConfigured ? "Modo Demo - Configurar Firebase para contenido real" : "Cargando contenido..."}
+                  {!isConfigured ? "Modo Demo - Configurar MongoDB para contenido real" : "Cargando contenido..."}
                 </p>
               </div>
             </div>
@@ -227,6 +249,7 @@ export default function Home() {
                     className="object-cover"
                     priority
                   />
+                  {/* Play icon overlay */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-black/60 rounded-full p-4">
                       <svg
@@ -236,6 +259,7 @@ export default function Home() {
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                         className="text-white"
+                        aria-hidden="true"
                       >
                         <polygon points="5,3 19,12 5,21" fill="currentColor" />
                       </svg>
@@ -245,7 +269,7 @@ export default function Home() {
               ) : (
                 <div className="flex items-center justify-center h-full bg-gradient-to-b from-purple-900/20 to-black">
                   <div className="text-center">
-                    <Music className="h-16 w-16 text-purple-400 mx-auto mb-4" />
+                    <Music className="h-16 w-16 text-purple-400 mx-auto mb-4" aria-hidden="true" />
                     <p className="text-xl font-bold">{currentMedia.title}</p>
                     <div className="mt-4 bg-zinc-800 rounded-lg p-4">
                       <p className="text-sm text-zinc-400">Audio no disponible en modo demo</p>
@@ -259,9 +283,8 @@ export default function Home() {
           )}
         </div>
 
-        {/* Right Side Controls - AJUSTADO POSICIÓN */}
+        {/* Right Side Controls */}
         <div className="absolute right-3 bottom-36 sm:bottom-40 z-10 flex flex-col items-center gap-3">
-          {/* Like Button */}
           <InteractiveButton
             icon={Heart}
             count={currentMedia?.likes || 0}
@@ -269,14 +292,12 @@ export default function Home() {
             onClick={() => console.log("Like clicked")}
             activeColor="text-red-500"
           />
-          {/* Comments Button */}
           <InteractiveButton
             icon={MessageCircle}
             count={currentMedia?.comments || 0}
             isActive={false}
             onClick={() => console.log("Comments clicked")}
           />
-          {/* Views Button */}
           <InteractiveButton
             icon={Eye}
             count={currentMedia?.views || 0}
@@ -284,7 +305,6 @@ export default function Home() {
             onClick={() => console.log("Views clicked")}
             activeColor="text-blue-500"
           />
-          {/* Save Button */}
           <InteractiveButton
             icon={Bookmark}
             count="Guardar"
@@ -292,7 +312,6 @@ export default function Home() {
             onClick={() => console.log("Save clicked")}
             activeColor="text-yellow-500"
           />
-          {/* Share Button */}
           <InteractiveButton
             icon={Share2}
             count="Compartir"
@@ -303,13 +322,12 @@ export default function Home() {
                   title: "Challz",
                   text: "Mira este increíble reto en Challz",
                   url: window.location.href,
-                })
+                });
               } else {
-                console.log("Share clicked")
+                console.log("Share clicked");
               }
             }}
           />
-          {/* Trending Button */}
           <InteractiveButton
             icon={TrendingUp}
             count="Tendencias"
@@ -319,15 +337,23 @@ export default function Home() {
           />
         </div>
 
-        {/* Bottom Content Info - AJUSTADO POSICIÓN */}
+        {/* Bottom Content Info */}
         <div className="absolute bottom-24 sm:bottom-28 left-0 right-12 p-4 z-10">
           {activeTab === "challenge" ? (
             <div>
-              <Badge className="mb-2 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30">RETO DEL DÍA</Badge>
-              <h2 className="text-xl font-bold mb-2">Crea un video bailando con tu canción favorita de los 90s</h2>
+              <Badge className="mb-2 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30">
+                RETO DEL DÍA
+              </Badge>
+              <h2 className="text-xl font-bold mb-2">
+                Crea un video bailando con tu canción favorita de los 90s
+              </h2>
               <div className="flex items-center gap-2 mb-3">
                 <Avatar className="h-8 w-8 border-2 border-purple-500">
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt="@challz" />
+                  <AvatarImage
+                    src="/placeholder.svg?height=32&width=32"
+                    alt="@challz"
+                    priority
+                  />
                   <AvatarFallback>CH</AvatarFallback>
                 </Avatar>
                 <p className="font-medium">@challz</p>
@@ -335,6 +361,7 @@ export default function Home() {
                   size="sm"
                   variant="secondary"
                   className="ml-2 text-xs bg-purple-600 hover:bg-purple-700 text-white"
+                  type="button"
                 >
                   Seguir
                 </Button>
@@ -343,18 +370,23 @@ export default function Home() {
                 Muestra tus mejores pasos de baile con una canción nostálgica. ¡Sorprende a todos con tu creatividad!
               </p>
               <div className="flex items-center gap-2 mb-3">
-                <Music className="h-4 w-4 text-zinc-400" />
+                <Music className="h-4 w-4 text-zinc-400" aria-hidden="true" />
                 <p className="text-sm text-zinc-400">Música de los 90s - Challz Mix</p>
               </div>
               <div className="flex gap-3">
                 <Button
                   onClick={handleCreateClick}
                   className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  type="button"
                 >
                   {!isConfigured ? "Configurar Firebase" : "Aceptar Reto"}
                 </Button>
                 <Link href="/reto/1">
-                  <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 bg-transparent">
+                  <Button
+                    variant="outline"
+                    className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 bg-transparent"
+                    type="button"
+                  >
                     Ver Respuestas
                   </Button>
                 </Link>
@@ -374,6 +406,7 @@ export default function Home() {
                       <AvatarImage
                         src={currentMedia.userPhotoURL || "/placeholder.svg?height=32&width=32"}
                         alt={currentMedia.username}
+                        priority
                       />
                       <AvatarFallback>{usernameFallback}</AvatarFallback>
                     </Avatar>
@@ -382,15 +415,21 @@ export default function Home() {
                       size="sm"
                       variant="secondary"
                       className="ml-auto text-xs bg-purple-600 hover:bg-purple-700 text-white"
+                      type="button"
                     >
                       Seguir
                     </Button>
                   </div>
-                  <p className="text-sm mb-2">{currentMedia.description || currentMedia.title}</p>
+                  <p className="text-sm mb-2">
+                    {currentMedia.description || currentMedia.title}
+                  </p>
                   {currentMedia.hashtags && currentMedia.hashtags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-3">
                       {currentMedia.hashtags.map((tag, index) => (
-                        <Badge key={index} className="bg-zinc-800 hover:bg-zinc-700 text-white border-none text-xs">
+                        <Badge
+                          key={index}
+                          className="bg-zinc-800 hover:bg-zinc-700 text-white border-none text-xs"
+                        >
                           {tag}
                         </Badge>
                       ))}
@@ -402,19 +441,31 @@ export default function Home() {
           )}
         </div>
 
-        {/* Swipe Up Indicator - AJUSTADO POSICIÓN */}
+        {/* Swipe Up Indicator */}
         <div className="absolute bottom-32 sm:bottom-36 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center animate-bounce">
           <p className="text-xs text-zinc-400 mb-1">Desliza hacia arriba</p>
-          <ChevronUp className="h-4 w-4 text-zinc-400" />
+          <ChevronUp className="h-4 w-4 text-zinc-400" aria-hidden="true" />
         </div>
       </main>
 
-      {/* Bottom Navigation - AJUSTADO PARA MOSTRAR TODOS LOS BOTONES */}
+      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-t border-zinc-800">
         <div className="flex items-center justify-around p-3 pb-6 sm:pb-3">
           {/* Home Button */}
-          <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-2">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2"
+            type="button"
+            aria-label="Inicio"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
               <path
                 d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"
                 stroke="white"
@@ -427,9 +478,19 @@ export default function Home() {
           </Button>
 
           {/* Profile Button */}
-          <button onClick={handleProfileClick}>
-            <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <button onClick={handleProfileClick} type="button" aria-label="Perfil">
+            <Button
+              variant="ghost"
+              className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
                 <path
                   d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
                   stroke="currentColor"
@@ -455,8 +516,10 @@ export default function Home() {
             size="icon"
             className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full h-14 w-14 flex items-center justify-center shadow-lg"
             onClick={handleCreateClick}
+            type="button"
+            aria-label="Crear contenido"
           >
-            <Plus className="h-7 w-7" />
+            <Plus className="h-7 w-7" aria-hidden="true" />
           </Button>
 
           {/* Chat Button */}
@@ -464,35 +527,52 @@ export default function Home() {
             variant="ghost"
             className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500"
             onClick={handleChatClick}
+            type="button"
+            aria-label="Chat"
           >
-            <MessageSquare className="h-5 w-5" />
+            <MessageSquare className="h-5 w-5" aria-hidden="true" />
             <span className="text-xs">Chat</span>
           </Button>
 
           {/* Alerts Button */}
-          <Link href="/alertas">
-            <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="text-xs">Alertas</span>
+          <Link href="/alertas" passHref>
+            <Button
+              variant="ghost"
+              className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500"
+              asChild
+              aria-label="Alertas"
+              type="button"
+            >
+              <a>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="text-xs">Alertas</span>
+              </a>
             </Button>
           </Link>
         </div>
       </nav>
     </div>
-  )
+  );
 }
