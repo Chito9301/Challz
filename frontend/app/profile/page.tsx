@@ -19,42 +19,41 @@ import ProtectedRoute from "@/components/protected-route"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSearchParams } from "next/navigation"
 
-// Importa tipo User para tipar correctamente el usuario autenticado
+// Importa la interfaz User para tipar el usuario actual
 import type { User } from "@/app/types/user"
 
 /**
  * Página de perfil de usuario.
- * 
- * Permite visualizar el perfil propio o de otro usuario, con sus medios (retos).
- * Utiliza hook `useAuth` para usuario actual,
- * y `getUserMedia` para obtener medios desde el backend mediante `media-service`.
- * 
- * Presenta pestañas para retos personales, creados y guardados (estos últimos solo visibles para perfil propio).
- * 
- * Incluye funcionalidad para reportar perfil si se visualiza uno que no es propio.
- * 
- * Mantiene diseño y colores originales, con lógica tersa y comentarios para colaboradores.
+ * Permite visualizar el perfil propio o de otro usuario,
+ * mostrando sus medios (retos), con pestañas para diferentes categorías.
  */
 export default function ProfilePage() {
+  // Obtenemos el usuario actual desde contexto, puede ser User o null
   const { user } = useAuth()
 
-  // Convierte user a User | undefined utilizando cast desde unknown para evitar error TS por null vs undefined
+  // Convertimos con doble cast para compatibilidad TS (user puede ser null)
   const typedUser = user as unknown as User | undefined
 
+  // Parámetros de búsqueda de la URL, para obtener userId si se muestra perfil ajeno
   const searchParams = useSearchParams()
   const profileUserId = searchParams.get("userId")
 
-  // Verificar si perfil actual es propio comparando IDs; usa encadenamiento opcional porque _id es opcional
+  // Chequeamos si es el perfil propio comparando con el id del usuario autenticado
   const isOwnProfile = !profileUserId || profileUserId === typedUser?._id
 
+  // Estado local para almacenar los medios del perfil mostrado
   const [userMedia, setUserMedia] = useState<MediaItem[]>([])
+
+  // Estado de carga para controlar spinners o skeletons
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchUserMedia() {
+      // Solo fetch si tenemos un usuario con id definido
       if (typedUser?._id) {
         try {
           setLoading(true)
+          // Obtenemos la media para profileUserId si definida, sino para el usuario actual
           const media = await getUserMedia(profileUserId || typedUser._id)
           setUserMedia(media)
         } catch (error) {
@@ -67,15 +66,18 @@ export default function ProfilePage() {
     fetchUserMedia()
   }, [typedUser, profileUserId])
 
+  // Función para reportar usuario, solo muestra alerta
   const handleReportUser = () => {
     if (confirm("¿Quieres reportar este perfil?")) {
       alert("Reporte de perfil enviado. Gracias por ayudarnos a mantener la comunidad segura.")
+      // Aquí puedes implementar llamada al backend para reportar realmente
     }
   }
 
   return (
     <ProtectedRoute>
       <div className="flex flex-col min-h-screen bg-black text-white">
+        {/* Header fijo con botones según tipo de perfil */}
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black/80 backdrop-blur-md border-b border-zinc-800">
           <div className="flex items-center gap-2">
             <Link href="/">
@@ -116,25 +118,28 @@ export default function ProfilePage() {
           </div>
         </header>
 
+        {/* Contenido principal con padding para el header */}
         <main className="flex-1 pt-16 pb-20">
           <div className="p-4">
+            {/* Avatar y datos básicos */}
             <div className="flex items-center gap-4 mb-6">
               <Avatar className="h-20 w-20 border-4 border-purple-500">
                 <AvatarImage
-                  src={typedUser?.photoURL || "/placeholder.svg?height=80&width=80"}
-                  alt={typedUser?.username || "@user"}
+                  src={typedUser?.photoURL ?? "/placeholder.svg?height=80&width=80"}
+                  alt={typedUser?.username ?? "@user"}
                 />
-                <AvatarFallback>{typedUser?.username?.charAt(0) || "U"}</AvatarFallback>
+                <AvatarFallback>{typedUser?.username?.charAt(0) ?? "U"}</AvatarFallback>
               </Avatar>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold">{typedUser?.username || "Usuario"}</h2>
+                  <h2 className="text-xl font-bold">{typedUser?.username ?? "Usuario"}</h2>
                 </div>
                 <p className="text-zinc-400">{typedUser?.email}</p>
                 <p className="text-sm mt-1">Amante de los retos y la creatividad 🚀</p>
               </div>
             </div>
 
+            {/* Estadísticas simplificadas */}
             <div className="flex justify-between mb-6 text-center">
               <div className="flex-1">
                 <p className="text-xl font-bold">{userMedia.length}</p>
@@ -150,6 +155,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* Botones de acción */}
             <div className="flex gap-3 mb-6">
               {isOwnProfile ? (
                 <>
@@ -183,6 +189,7 @@ export default function ProfilePage() {
               )}
             </div>
 
+            {/* Pestañas para retos */}
             <Tabs defaultValue="challenges" className="w-full">
               <TabsList className="w-full bg-zinc-900 border-b border-zinc-800 rounded-none h-12">
                 <TabsTrigger
@@ -219,8 +226,8 @@ export default function ProfilePage() {
                         <Image
                           src={
                             item.type === "image"
-                              ? item.mediaUrl
-                              : item.thumbnailUrl || `/placeholder.svg?height=150&width=150`
+                              ? item.mediaUrl ?? `/placeholder.svg?height=150&width=150`
+                              : item.thumbnailUrl ?? `/placeholder.svg?height=150&width=150`
                           }
                           alt={item.title}
                           fill
@@ -286,4 +293,3 @@ export default function ProfilePage() {
     </ProtectedRoute>
   )
 }
-
