@@ -94,7 +94,7 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
         .filter((tag) => tag.length > 1)
 
       // Llama a la función uploadMedia (asegúrate que uploadMedia acepte estos parámetros)
-      await uploadMedia(file, user.uid, user.username || "Usuario", user.photoURL, {
+      await uploadMedia(file, user.id, user.username || "Usuario", user.photoURL, {
         title,
         description,
         type: mediaType,
