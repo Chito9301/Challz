@@ -1,6 +1,16 @@
+/**
+ * Módulo para gestión de medios (Media) en la aplicación.
+ * Define tipos, funciones para obtención, manipulación y subida de medios.
+ */
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 import { getToken } from "./api-backend";
+
+/**
+ * Tipo que representa los posibles valores del tipo de media.
+ */
+export type MediaType = "image" | "video" | "audio" | string;
 
 /**
  * Definición extendida del tipo MediaItem que representa un medio con sus propiedades necesarias para la UI.
@@ -8,26 +18,25 @@ import { getToken } from "./api-backend";
 export type MediaItem = {
   id: string;
   title: string;
-  description?: string;    // Opcional
-  url: string;             // URL base
-  mediaUrl?: string;       // URL para renderizado (puede coincidir con url)
-  thumbnailUrl?: string;   // <--- Propiedad opcional añadida (miniatura)
+  description?: string;       // Opcional
+  url: string;                // URL base
+  mediaUrl?: string;          // URL para renderizado (puede coincidir con url)
+  thumbnailUrl?: string;      // Miniatura opcional
   userId: string;
-  username?: string;       // Nombre del usuario que subió el media
-  userPhotoURL?: string;   // Foto del usuario
-  createdAt: string;       // ISO string
+  username?: string;          // Nombre del usuario que subió el media
+  userPhotoURL?: string;      // Foto del usuario
+  createdAt: string;          // ISO string
   updatedAt?: string;
   views: number;
   likes: number;
   comments: number;
-  type?: "image" | "video" | "audio" | string;  // Tipo de media para condicional en UI
+  type?: MediaType;           // Tipo de media para condicional en UI
   challengeTitle?: string;
   hashtags?: string[];
 };
 
-
 /**
- * Obtiene la lista de medios de un usuario público (puede ser autenticado o no)
+ * Obtiene la lista de medios de un usuario público (puede ser autenticado o no).
  * @param userId ID del usuario al que consultar los medios
  * @returns Array de objetos MediaItem
  */
@@ -121,7 +130,9 @@ export async function incrementMediaStats(
 }
 
 /**
- * Opcional: Obtener un solo media por id, con mapeo para mediaUrl
+ * Opcional: Obtener un solo media por id, con mapeo para mediaUrl.
+ * @param mediaId ID del medio a obtener
+ * @returns objeto MediaItem o null si no existe
  */
 export async function fetchMediaById(mediaId: string): Promise<MediaItem | null> {
   const res = await fetch(`${API_URL}/media/${mediaId}`, {
@@ -147,12 +158,28 @@ export async function fetchMediaById(mediaId: string): Promise<MediaItem | null>
 }
 
 /**
- * Sube un archivo de media (imagen, video, audio...) a Cloudinary.
- * Puede usarse desde el frontend directamente o llamar a un endpoint backend que procese la subida.
+ * Sube un archivo de media (imagen, video, audio...) a Cloudinary y registra metadata adicional.
  * @param file Archivo a subir
- * @returns string URL pública del archivo en Cloudinary
+ * @param userId ID del usuario que sube el archivo
+ * @param username Nombre del usuario
+ * @param userPhotoURL URL foto del usuario
+ * @param metadata Información extra como título, descripción, tipo, hashtags, challengeId, etc.
+ * @returns URL pública del archivo en Cloudinary
  */
-export async function uploadMedia(file: File): Promise<string> {
+export async function uploadMedia(
+  file: File,
+  userId: string,
+  username: string,
+  userPhotoURL?: string,
+  metadata?: {
+    title?: string;
+    description?: string;
+    type?: MediaType;
+    hashtags?: string[];
+    challengeId?: string;
+    challengeTitle?: string;
+  }
+): Promise<string> {
   if (!file) throw new Error("Archivo no proporcionado");
 
   const formData = new FormData();
@@ -163,6 +190,7 @@ export async function uploadMedia(file: File): Promise<string> {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   if (!cloudName) throw new Error("Falta configurar NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME");
 
+  // Subimos el archivo a Cloudinary
   const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
     method: "POST",
     body: formData,
@@ -173,5 +201,32 @@ export async function uploadMedia(file: File): Promise<string> {
   }
 
   const data = await res.json();
-  return data.secure_url;
+  const mediaUrl = data.secure_url as string;
+
+  // Opcionalmente: hacer un POST a tu backend para guardar metadata y vincular la media subida
+  try {
+    await fetch(`${API_URL}/media/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url: mediaUrl,
+        userId,
+        username,
+        userPhotoURL,
+        ...metadata,
+      }),
+    });
+  } catch (error) {
+    console.error("Error registrando metadata de media:", error);
+    // Opcional: puedes decidir si lanzar error o no
+  }
+
+  return mediaUrl;
 }
+
+/**
+ * Exporta la URL base de la API para ser usada en otros módulos si se requiere.
+ */
+export { API_URL };

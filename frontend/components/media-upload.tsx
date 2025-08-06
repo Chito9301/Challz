@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Camera, ImageIcon, Mic, Loader2, X } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
+// Importa MediaType corregido según la exportación que agregamos en media-service.ts
 import { uploadMedia, type MediaType } from "@/lib/media-service"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -16,9 +17,19 @@ interface MediaUploadProps {
   onSuccess?: () => void
 }
 
+/**
+ * Componente para subir un medio (video, imagen o audio).
+ * Gestiona preview, selección de archivo, tipo de medio y envío.
+ *
+ * @param challengeId - ID del reto (opcional)
+ * @param challengeTitle - Título del reto (opcional)
+ * @param onSuccess - Callback tras subida exitosa
+ */
 export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: MediaUploadProps) {
   const { user } = useAuth()
   const router = useRouter()
+
+  // Estado para tipo de medio ("video" | "image" | "audio")
   const [mediaType, setMediaType] = useState<MediaType>("video")
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -27,8 +38,13 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
   const [preview, setPreview] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState("")
+
+  // Referencia al input file para reiniciar en limpieza
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  /**
+   * Maneja cambio de archivo. Lee preview si es imagen.
+   */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0]
@@ -41,13 +57,16 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
         }
         reader.readAsDataURL(selectedFile)
       } else if (mediaType === "video" && selectedFile.type.startsWith("video/")) {
-        setPreview(null) // No preview thumbnail implemented yet
+        setPreview(null) // Todavía no hay preview para video
       } else {
-        setPreview(null) // For audio or other types, no preview
+        setPreview(null) // Para audio u otros tipos no hay preview
       }
     }
   }
 
+  /**
+   * Maneja la subida del medio, validando campos y enviando el archivo.
+   */
   const handleUpload = async () => {
     if (!user) {
       router.push("/auth/login")
@@ -68,11 +87,13 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
       setIsUploading(true)
       setError("")
 
+      // Procesa hashtags en array, asegurando formato con #
       const hashtagArray = hashtags
         .split(/[,\s]+/)
         .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
         .filter((tag) => tag.length > 1)
 
+      // Llama a la función uploadMedia (asegúrate que uploadMedia acepte estos parámetros)
       await uploadMedia(file, user.uid, user.username || "Usuario", user.photoURL, {
         title,
         description,
@@ -82,7 +103,7 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
         challengeTitle,
       })
 
-      // Reset form after successful upload
+      // Limpia form tras subida exitosa
       setFile(null)
       setPreview(null)
       setTitle("")
@@ -102,10 +123,16 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
     }
   }
 
+  /**
+   * Activa el input file oculto para seleccionar archivo.
+   */
   const triggerFileInput = () => {
     fileInputRef.current?.click()
   }
 
+  /**
+   * Limpia el archivo seleccionado y su preview.
+   */
   const clearFile = () => {
     setFile(null)
     setPreview(null)
@@ -116,9 +143,9 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
 
   return (
     <div className="space-y-6">
+      {/* Selector de tipo de media */}
       <div className="flex justify-center mb-4">
         <div className="flex bg-zinc-900 rounded-lg p-1">
-          {/* Media type selector buttons */}
           <button
             onClick={() => setMediaType("video")}
             className={`flex items-center px-4 py-2 rounded-lg ${
@@ -155,6 +182,7 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
         </div>
       </div>
 
+      {/* Vista previa o selector de archivo */}
       {file ? (
         <div className="relative border-2 border-dashed border-zinc-700 rounded-lg p-4 text-center">
           <button onClick={clearFile} className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
@@ -196,11 +224,7 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
             {mediaType === "audio" && <Mic className="h-12 w-12 text-zinc-500 mb-4" />}
 
             <h3 className="font-medium mb-2">
-              {mediaType === "video"
-                ? "Sube tu video"
-                : mediaType === "image"
-                ? "Sube tu foto"
-                : "Sube tu audio"}
+              {mediaType === "video" ? "Sube tu video" : mediaType === "image" ? "Sube tu foto" : "Sube tu audio"}
             </h3>
             <p className="text-zinc-500 text-sm mb-4">Arrastra y suelta o haz clic para seleccionar</p>
             <Button className="bg-zinc-800 hover:bg-zinc-700">
@@ -210,8 +234,10 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
         </div>
       )}
 
+      {/* Mensaje de error */}
       {error && <div className="bg-red-900/20 text-red-300 p-3 rounded-md text-sm">{error}</div>}
 
+      {/* Campos de texto: título, descripción, hashtags */}
       <div className="space-y-4">
         <div>
           <label className="text-sm text-zinc-400 mb-1 block">Título</label>
@@ -244,6 +270,7 @@ export default function MediaUpload({ challengeId, challengeTitle, onSuccess }: 
         </div>
       </div>
 
+      {/* Botón publicar */}
       <Button
         onClick={handleUpload}
         disabled={isUploading || !file}
