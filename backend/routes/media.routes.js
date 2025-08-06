@@ -1,11 +1,14 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-// Importar el modelo Media (ver Paso 2)
-const Media = require('../models/media');
+// Importar modelo Media (usa mayúscula M según convención)
+const Media = require("../models/Media");
 
-// Ruta POST para registrar media
-router.post('/register', async (req, res) => {
+/**
+ * POST /media/register
+ * Registra un nuevo medio en la base de datos con metadata recibida.
+ */
+router.post("/register", async (req, res) => {
   try {
     const {
       url,
@@ -20,12 +23,16 @@ router.post('/register', async (req, res) => {
       challengeTitle,
     } = req.body;
 
-    if (!url || !userId) {
-      return res.status(400).json({ error: 'URL y userId son obligatorios' });
+    // Validaciones básicas
+    if (!url || !userId || !title || !type) {
+      return res.status(400).json({
+        error: "Faltan campos obligatorios: url, userId, title, type",
+      });
     }
 
+    // Crear nuevo documento Media
     const newMedia = new Media({
-      url,
+      mediaUrl: url,       // Según el modelo el campo es mediaUrl
       userId,
       username,
       userPhotoURL,
@@ -42,11 +49,18 @@ router.post('/register', async (req, res) => {
     });
 
     await newMedia.save();
-    res.status(201).json({ message: 'Media registrada exitosamente', media: newMedia });
+
+    return res.status(201).json({
+      message: "Media registrada exitosamente",
+      media: newMedia,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error interno al registrar media' });
+    console.error("Error registrando media:", error);
+    return res.status(500).json({
+      error: "Error interno al registrar media",
+    });
   }
 });
 
 module.exports = router;
+
