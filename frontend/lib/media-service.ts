@@ -1,16 +1,15 @@
 /**
- * Servicio combinado para gestión de medios (Media).
- * Combina definición de tipos y funciones antiguas y actuales,
- * añadiendo tipos exportados, funciones de subida a Cloudinary por separado,
- * y funciones para obtener trending, recientes, de usuarios, y para incrementar stats.
+ * Servicio para gestión de medios (Media) en la aplicación.
+ * Exporta tipos, funciones para subir, obtener y modificar datos de media.
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+// Tipo que representa posibles valores para el tipo media
 export type MediaType = "video" | "image" | "audio" | string;
 
 /**
- * Tipo MediaItem (exportado), según versión antigua pero extendida.
+ * Interfaz exportada del tipo MediaItem, usada para tipar media en toda la app.
  */
 export interface MediaItem {
   id: string;
@@ -19,7 +18,7 @@ export interface MediaItem {
   userPhotoURL?: string;
   title: string;
   description: string;
-  url?: string;             // añadido opcional para retrocompatibilidad
+  url?: string;             // Url base, opcional para retrocompatibilidad
   mediaUrl?: string;
   thumbnailUrl?: string;
   type: MediaType;
@@ -27,13 +26,13 @@ export interface MediaItem {
   likes: number;
   views: number;
   comments: number;
-  createdAt: string;
+  createdAt: string;       // Fecha en formato ISO string
   updatedAt?: string;
   challengeId?: string;
   challengeTitle?: string;
 }
 
-/** Cloudinary configuración (variables de entorno obligatorias) */
+/** Configuración para subida a Cloudinary */
 const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`;
 const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
@@ -42,7 +41,8 @@ if (!CLOUDINARY_UPLOAD_URL || !CLOUDINARY_UPLOAD_PRESET) {
 }
 
 /**
- * Función para subir archivos a Cloudinary (separada para mayor control).
+ * Sube un archivo a Cloudinary y devuelve URL pública y miniatura (opcional).
+ * Útil para separar la subida del registro en backend.
  */
 export async function uploadToCloudinary(
   file: File,
@@ -67,7 +67,8 @@ export async function uploadToCloudinary(
 }
 
 /**
- * Función para subir media: sube a Cloudinary y registra en backend.
+ * Sube media: sube archivo a Cloudinary y registra metadata en backend.
+ * Devuelve la URL pública del media subido.
  */
 export async function uploadMedia(
   file: File,
@@ -86,13 +87,10 @@ export async function uploadMedia(
   if (!file) throw new Error("Archivo no proporcionado");
 
   const folderPath = `${userId}/${metadata?.type || "unknown"}`;
-
-  // Subir archivo a Cloudinary usando función separada
   const uploadResult = await uploadToCloudinary(file, folderPath);
 
   const mediaUrl = uploadResult.secure_url;
 
-  // Registrar metadata en backend
   try {
     await fetch(`${API_URL}/media/register`, {
       method: "POST",
@@ -113,7 +111,9 @@ export async function uploadMedia(
 }
 
 /**
- * Obtiene la lista de medios trending (populares), opcionalmente filtrando por orden y límite.
+ * Obtiene media trending, ordenada por 'views', 'likes' o 'comments'.
+ * @param orderBy campo de orden (opcional, defecto 'views')
+ * @param limit cantidad máxima (opcional, defecto 10)
  */
 export async function getTrendingMedia(
   orderBy: "views" | "likes" | "comments" = "views",
@@ -132,7 +132,8 @@ export async function getTrendingMedia(
 }
 
 /**
- * Obtiene la lista de medios más recientes (función del archivo antiguo).
+ * Obtiene media más reciente.
+ * @param limit cantidad máxima (opcional, defecto 10)
  */
 export async function getRecentMedia(limit: number = 10): Promise<MediaItem[]> {
   try {
@@ -148,7 +149,8 @@ export async function getRecentMedia(limit: number = 10): Promise<MediaItem[]> {
 }
 
 /**
- * Obtiene la lista de medios de un usuario en particular.
+ * Obtiene media de un usuario.
+ * @param userId ID del usuario
  */
 export async function getUserMedia(userId: string): Promise<MediaItem[]> {
   try {
@@ -164,7 +166,7 @@ export async function getUserMedia(userId: string): Promise<MediaItem[]> {
 }
 
 /**
- * Incrementa un contador (vista, like, comentario) de un media.
+ * Incrementa estadística (views, likes, comments) de un media.
  */
 export async function incrementMediaStats(
   mediaId: string,
@@ -184,7 +186,9 @@ export async function incrementMediaStats(
 }
 
 /**
- * Opcional: Obtener un sólo media por ID con mapeo para mediaUrl.
+ * Obtiene un media por ID.
+ * @param mediaId ID del media
+ * @returns MediaItem o null si no existe
  */
 export async function fetchMediaById(mediaId: string): Promise<MediaItem | null> {
   try {
@@ -205,4 +209,5 @@ export async function fetchMediaById(mediaId: string): Promise<MediaItem | null>
     throw new Error(`Error en fetchMediaById: ${error}`);
   }
 }
+
 
