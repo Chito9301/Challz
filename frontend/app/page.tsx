@@ -89,9 +89,8 @@ export default function Home() {
   }, []);
 
   const currentMedia = trendingMedia[currentIndex];
-  const usernameFallback = currentMedia?.username
-    ? currentMedia.username.charAt(0).toUpperCase()
-    : "?";
+  const usernameFallback =
+    currentMedia?.username?.charAt(0).toUpperCase() ?? "?";
 
   // Cambia índice al siguiente contenido trending, con wrap-around
   const handleSwipeUp = () => {
@@ -129,14 +128,14 @@ export default function Home() {
     }
   };
 
-  // Evitar renderizar contenido dependiente sin data válida
-  if (!loading && trendingMedia.length > 0 && !currentMedia) {
-    return null;
-  }
+  // Comentamos esta condición para que no retorne nada y permita el render aunque currentMedia sea undefined
+  // if (!loading && trendingMedia.length > 0 && !currentMedia) {
+  //   return null;
+  // }
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
-      {/* Header */}
+      {/* Header (igual que antes, por brevedad no se repite aquí) */}
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-transparent">
         <div className="flex items-center gap-2">
           <AppIcon size={32} />
@@ -215,8 +214,13 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Contenido fijo de prueba para asegurar que se renderiza */}
+      <div style={{ color: "white", padding: "12px", textAlign: "center" }}>
+        Aquí debería mostrarse el contenido principal...
+      </div>
+
       {/* Main Content - TikTok Style */}
-      <main className="flex-1 relative pb-24" onClick={handleSwipeUp}>
+      <main className="flex-1 relative pb-28" onClick={handleSwipeUp}>
         {/* Full Screen Video Background */}
         <div className="absolute inset-0 bg-zinc-900">
           {loading || trendingMedia.length === 0 ? (
@@ -232,7 +236,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="relative h-full w-full">
-              {currentMedia.type === "image" ? (
+              {currentMedia?.type === "image" ? (
                 <Image
                   src={currentMedia.mediaUrl || "/placeholder.svg"}
                   alt={currentMedia.title}
@@ -240,7 +244,7 @@ export default function Home() {
                   className="object-cover"
                   priority
                 />
-              ) : currentMedia.type === "video" ? (
+              ) : currentMedia?.type === "video" ? (
                 <div className="relative h-full w-full">
                   <Image
                     src={currentMedia.mediaUrl || "/placeholder.svg"}
@@ -270,7 +274,7 @@ export default function Home() {
                 <div className="flex items-center justify-center h-full bg-gradient-to-b from-purple-900/20 to-black">
                   <div className="text-center">
                     <Music className="h-16 w-16 text-purple-400 mx-auto mb-4" aria-hidden="true" />
-                    <p className="text-xl font-bold">{currentMedia.title}</p>
+                    <p className="text-xl font-bold">{currentMedia?.title ?? "Audio no disponible"}</p>
                     <div className="mt-4 bg-zinc-800 rounded-lg p-4">
                       <p className="text-sm text-zinc-400">Audio no disponible en modo demo</p>
                     </div>
@@ -349,7 +353,6 @@ export default function Home() {
               </h2>
               <div className="flex items-center gap-2 mb-3">
                 <Avatar className="h-8 w-8 border-2 border-purple-500">
-                  {/* Removed `priority` prop because AvatarImage does not support it */}
                   <AvatarImage
                     src="/placeholder.svg?height=32&width=32"
                     alt="@challz"
@@ -404,7 +407,6 @@ export default function Home() {
                   <div className="flex items-center gap-2 mb-2">
                     <Avatar className="h-8 w-8 border-2 border-purple-500">
                       <AvatarImage
-                        // Removed `priority` here as well
                         src={currentMedia.userPhotoURL || "/placeholder.svg?height=32&width=32"}
                         alt={currentMedia.username}
                       />
@@ -478,7 +480,6 @@ export default function Home() {
           </Button>
 
           {/* Profile Button */}
-          {/* Changed from nested <button><Button></Button></button> to a single Button */}
           <Button
             onClick={handleProfileClick}
             variant="ghost"
@@ -536,43 +537,41 @@ export default function Home() {
             <span className="text-xs">Chat</span>
           </Button>
 
-          {/* Alerts Button */}
-          <Link href="/alertas" passHref>
-            <Button
-              variant="ghost"
-              className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500"
-              asChild
-              aria-label="Alertas"
-              type="button"
-            >
-              <a>
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span className="text-xs">Alertas</span>
-              </a>
-            </Button>
-          </Link>
+          {/* Alerts Button corregido para evitar <a> dentro de <a> */}
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2 text-zinc-500"
+            asChild
+            aria-label="Alertas"
+            type="button"
+          >
+            <Link href="/alertas" aria-label="Alertas">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="text-xs">Alertas</span>
+            </Link>
+          </Button>
         </div>
       </nav>
     </div>

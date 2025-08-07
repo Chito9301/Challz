@@ -18,7 +18,7 @@ const AccordionItem = React.forwardRef<
     {...props}
   />
 ))
-AccordionItem.username = "AccordionItem"
+ AccordionItem.username = "AccordionItem"
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
@@ -38,7 +38,7 @@ const AccordionTrigger = React.forwardRef<
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ))
-AccordionTrigger.username = AccordionPrimitive.Trigger.username
+// AccordionTrigger.username = AccordionPrimitive.Trigger.username
 
 const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
@@ -52,7 +52,6 @@ const AccordionContent = React.forwardRef<
     <div className={cn("pb-4 pt-0", className)}>{children}</div>
   </AccordionPrimitive.Content>
 ))
-
-AccordionContent.username = AccordionPrimitive.Content.username
+// AccordionContent.username = AccordionPrimitive.Content.username
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
