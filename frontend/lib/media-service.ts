@@ -1,190 +1,73 @@
 /**
- * Módulo para gestión de medios (Media) en la aplicación.
- * Define tipos, funciones para obtención, manipulación y subida de medios.
+ * Servicio combinado para gestión de medios (Media).
+ * Combina definición de tipos y funciones antiguas y actuales,
+ * añadiendo tipos exportados, funciones de subida a Cloudinary por separado,
+ * y funciones para obtener trending, recientes, de usuarios, y para incrementar stats.
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-import { getToken } from "./api-backend";
+export type MediaType = "video" | "image" | "audio" | string;
 
 /**
- * Tipo que representa los posibles valores del tipo de media.
+ * Tipo MediaItem (exportado), según versión antigua pero extendida.
  */
-export type MediaType = "image" | "video" | "audio" | string;
-
-/**
- * Definición extendida del tipo MediaItem que representa un medio con sus propiedades necesarias para la UI.
- */
-export type MediaItem = {
+export interface MediaItem {
   id: string;
-  title: string;
-  description?: string;        // Opcional
-  url: string;                 // URL base
-  mediaUrl?: string;           // URL para renderizado (puede coincidir con url)
-  thumbnailUrl?: string;       // Miniatura opcional
   userId: string;
-  username?: string;           // Nombre del usuario que subió el media
-  userPhotoURL?: string;       // Foto del usuario
-  createdAt: string;           // ISO string
-  updatedAt?: string;
-  views: number;
+  username: string;
+  userPhotoURL?: string;
+  title: string;
+  description: string;
+  url?: string;             // añadido opcional para retrocompatibilidad
+  mediaUrl?: string;
+  thumbnailUrl?: string;
+  type: MediaType;
+  hashtags: string[];
   likes: number;
+  views: number;
   comments: number;
-  type?: MediaType;            // Tipo de media para condicional en UI
+  createdAt: string;
+  updatedAt?: string;
+  challengeId?: string;
   challengeTitle?: string;
-  hashtags?: string[];
-};
+}
 
-/**
- * Obtiene la lista de medios de un usuario público (puede ser autenticado o no).
- * @param userId ID del usuario al que consultar los medios
- * @returns Array de objetos MediaItem
- */
-export async function getUserMedia(userId: string): Promise<MediaItem[]> {
-  try {
-    const res = await fetch(`${API_URL}/users/${userId}/media`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+/** Cloudinary configuración (variables de entorno obligatorias) */
+const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`;
+const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-    if (!res.ok) {
-      let errorMsg = `Error al obtener medios del usuario. Status: ${res.status}`;
-      try {
-        const data = await res.json();
-        errorMsg = data.error || data.message || errorMsg;
-      } catch {
-        // No hacer nada, usar errorMsg original
-      }
-      throw new Error(errorMsg);
-    }
-
-    const medias: MediaItem[] = await res.json();
-    return medias.map((media) => ({
-      ...media,
-      mediaUrl: media.mediaUrl || media.url,
-    }));
-  } catch (error: any) {
-    // Error de red o parsing JSON
-    throw new Error(`Error en getUserMedia: ${error.message || error.toString()}`);
-  }
+if (!CLOUDINARY_UPLOAD_URL || !CLOUDINARY_UPLOAD_PRESET) {
+  throw new Error("Cloudinary no está configurado correctamente en variables de entorno");
 }
 
 /**
- * Obtiene la lista de medios trending (populares), opcionalmente filtrando por orden y límite.
- * @param orderBy Campo para ordenar (por ejemplo, "views", "likes")
- * @param limit Cantidad máxima de resultados
- * @returns Array de objetos MediaItem
+ * Función para subir archivos a Cloudinary (separada para mayor control).
  */
-export async function getTrendingMedia(
-  orderBy?: string,
-  limit?: number
-): Promise<MediaItem[]> {
-  try {
-    let url = `${API_URL}/media/trending`;
-    const params = new URLSearchParams();
+export async function uploadToCloudinary(
+  file: File,
+  folderPath: string
+): Promise<{ secure_url: string; thumbnail_url?: string }> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET!);
+  formData.append("folder", folderPath);
 
-    if (orderBy) params.append("orderBy", orderBy);
-    if (limit) params.append("limit", limit.toString());
+  const res = await fetch(CLOUDINARY_UPLOAD_URL, {
+    method: "POST",
+    body: formData,
+  });
 
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
-
-    const res = await fetch(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) {
-      let errorMsg = `Error al obtener trending. Status: ${res.status}`;
-      try {
-        const data = await res.json();
-        errorMsg = data.error || data.message || errorMsg;
-      } catch {
-        // No hacer nada, usar mensaje original
-      }
-      throw new Error(errorMsg);
-    }
-
-    const medias: MediaItem[] = await res.json();
-    return medias.map((media) => ({
-      ...media,
-      mediaUrl: media.mediaUrl || media.url,
-    }));
-  } catch (error: any) {
-    throw new Error(`Error en getTrendingMedia: ${error.message || error.toString()}`);
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error("Error subiendo archivo a Cloudinary: " + errorText);
   }
+
+  return await res.json();
 }
 
 /**
- * Incrementa un contador (vista, like, comentario) de un media.
- * @param mediaId string - ID del media
- * @param stat "views" | "likes" | "comments"
- */
-export async function incrementMediaStats(
-  mediaId: string,
-  stat: "views" | "likes" | "comments"
-): Promise<void> {
-  try {
-    const res = await fetch(`${API_URL}/media/${mediaId}/increment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ stat }),
-    });
-
-    if (!res.ok) {
-      let errorMsg = `Error al incrementar estadística. Status: ${res.status}`;
-      try {
-        const data = await res.json();
-        errorMsg = data.error || data.message || errorMsg;
-      } catch {}
-      throw new Error(errorMsg);
-    }
-  } catch (error: any) {
-    throw new Error(`Error en incrementMediaStats: ${error.message || error.toString()}`);
-  }
-}
-
-/**
- * Opcional: Obtener un solo media por id, con mapeo para mediaUrl.
- * @param mediaId ID del medio a obtener
- * @returns objeto MediaItem o null si no existe
- */
-export async function fetchMediaById(mediaId: string): Promise<MediaItem | null> {
-  try {
-    const res = await fetch(`${API_URL}/media/${mediaId}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      let errorMsg = `Error al obtener media por ID. Status: ${res.status}`;
-      try {
-        const data = await res.json();
-        errorMsg = data.error || data.message || errorMsg;
-      } catch {}
-      throw new Error(errorMsg);
-    }
-
-    const media: MediaItem = await res.json();
-    return {
-      ...media,
-      mediaUrl: media.mediaUrl || media.url,
-    };
-  } catch (error: any) {
-    throw new Error(`Error en fetchMediaById: ${error.message || error.toString()}`);
-  }
-}
-
-/**
- * Sube un archivo de media (imagen, video, audio...) a Cloudinary y registra metadata adicional.
- * @param file Archivo a subir
- * @param userId ID del usuario que sube el archivo
- * @param username Nombre del usuario
- * @param userPhotoURL URL foto del usuario
- * @param metadata Información extra como título, descripción, tipo, hashtags, challengeId, etc.
- * @returns URL pública del archivo en Cloudinary
+ * Función para subir media: sube a Cloudinary y registra en backend.
  */
 export async function uploadMedia(
   file: File,
@@ -202,34 +85,18 @@ export async function uploadMedia(
 ): Promise<string> {
   if (!file) throw new Error("Archivo no proporcionado");
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "");
-  formData.append("folder", "retos");
+  const folderPath = `${userId}/${metadata?.type || "unknown"}`;
 
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  if (!cloudName) throw new Error("Falta configurar NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME");
+  // Subir archivo a Cloudinary usando función separada
+  const uploadResult = await uploadToCloudinary(file, folderPath);
 
-  // Subimos el archivo a Cloudinary
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
-    method: "POST",
-    body: formData,
-  });
+  const mediaUrl = uploadResult.secure_url;
 
-  if (!res.ok) {
-    throw new Error("Error al subir archivo a Cloudinary");
-  }
-
-  const data = await res.json();
-  const mediaUrl = data.secure_url as string;
-
-  // Opcionalmente: hacer un POST a tu backend para guardar metadata y vincular la media subida
+  // Registrar metadata en backend
   try {
     await fetch(`${API_URL}/media/register`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         url: mediaUrl,
         userId,
@@ -240,13 +107,102 @@ export async function uploadMedia(
     });
   } catch (error) {
     console.error("Error registrando metadata de media:", error);
-    // Opcional: decidir si lanzar error o ignorar
   }
 
   return mediaUrl;
 }
 
 /**
- * Exporta la URL base de la API para ser usada en otros módulos si se requiere.
+ * Obtiene la lista de medios trending (populares), opcionalmente filtrando por orden y límite.
  */
-export { API_URL };
+export async function getTrendingMedia(
+  orderBy: "views" | "likes" | "comments" = "views",
+  limit: number = 10
+): Promise<MediaItem[]> {
+  try {
+    const res = await fetch(`${API_URL}/media/trending?orderBy=${orderBy}&limit=${limit}`);
+
+    if (!res.ok) throw new Error("Error obteniendo trending media");
+
+    return await res.json();
+  } catch (error) {
+    console.warn("getTrendingMedia fallback vacío:", error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene la lista de medios más recientes (función del archivo antiguo).
+ */
+export async function getRecentMedia(limit: number = 10): Promise<MediaItem[]> {
+  try {
+    const res = await fetch(`${API_URL}/media/recent?limit=${limit}`);
+
+    if (!res.ok) throw new Error("Error obteniendo media reciente");
+
+    return await res.json();
+  } catch (error) {
+    console.warn("getRecentMedia fallback vacío:", error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene la lista de medios de un usuario en particular.
+ */
+export async function getUserMedia(userId: string): Promise<MediaItem[]> {
+  try {
+    const res = await fetch(`${API_URL}/media/user/${userId}`);
+
+    if (!res.ok) throw new Error("Error obteniendo media de usuario");
+
+    return await res.json();
+  } catch (error) {
+    console.warn("getUserMedia fallback vacío:", error);
+    return [];
+  }
+}
+
+/**
+ * Incrementa un contador (vista, like, comentario) de un media.
+ */
+export async function incrementMediaStats(
+  mediaId: string,
+  stat: "views" | "likes" | "comments"
+): Promise<void> {
+  try {
+    const res = await fetch(`${API_URL}/media/${mediaId}/increment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stat }),
+    });
+
+    if (!res.ok) throw new Error("Error incrementando estadística");
+  } catch (error) {
+    console.warn(`incrementMediaStats error para media ${mediaId}:`, error);
+  }
+}
+
+/**
+ * Opcional: Obtener un sólo media por ID con mapeo para mediaUrl.
+ */
+export async function fetchMediaById(mediaId: string): Promise<MediaItem | null> {
+  try {
+    const res = await fetch(`${API_URL}/media/${mediaId}`);
+
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      throw new Error("Error al obtener media por ID");
+    }
+
+    const media: MediaItem = await res.json();
+
+    return {
+      ...media,
+      mediaUrl: media.mediaUrl || media.url,
+    };
+  } catch (error) {
+    throw new Error(`Error en fetchMediaById: ${error}`);
+  }
+}
+
