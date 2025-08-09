@@ -1,194 +1,34 @@
 {
   "compilerOptions": {
-    "target": "esnext", // Usar la última versión JS soportada
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ], // Librerías estándar para navegador y ESNext
-    "allowJs": true, // Permitir archivos JS
-    "skipLibCheck": true, // Saltar chequeo estricto de libs para acelerar compilación
-    "strict": true, // Habilitar reglas estrictas de TS
-    "forceConsistentCasingInFileNames": true, // Mayúsculas/minúsculas consistentes en imports
-    "noEmit": true, // No emitir archivo JS (Next.js lo gestiona)
-    "esModuleInterop": true, // Interoperabilidad con módulos ES6
-    "module": "esnext", // Módulos ESNext
-    "moduleResolution": "node", // Resolución estilo node
-    "resolveJsonModule": true, // Permitir importar JSON
-    "isolatedModules": true, // Cada archivo se considera un módulo aislado
-    "jsx": "preserve", // JSX se mantiene para Babel/Next.js
-    "incremental": true, // Habilitar compilación incremental
-    "baseUrl": ".", // Base para resolución de módulos
+    "target": "esnext",                // Usar la última versión estándar de JS soportada
+    "lib": ["dom", "dom.iterable", "esnext"],  // Librerías para DOM y ESNext
+    "allowJs": true,                   // Permitir archivos JavaScript junto a TS
+    "skipLibCheck": true,              // Saltar chequeo estricto en librerías para acelerar build
+    "strict": true,                   // Activar reglas estrictas de TS
+    "forceConsistentCasingInFileNames": true, // Mayúsculas y minúsculas consistentes en imports
+    "noEmit": true,                   // No emitir salida JS (Next.js maneja esto)
+    "esModuleInterop": true,          // Mejor interoperabilidad con módulos CommonJS
+    "module": "esnext",               // Usar módulos ESNext (import/export)
+    "moduleResolution": "node",       // Resolución de módulos estilo Node.js
+    "resolveJsonModule": true,         // Permitir importar archivos JSON
+    "isolatedModules": true,           // Tratar cada archivo como módulo independiente
+    "jsx": "preserve",                 // Dejamos JSX para que Next.js/Babel lo transforme
+    "incremental": true,               // Compilación incremental para acelerar sucesivas builds
+    "baseUrl": ".",                   // Directorio base para resolver módulos y alias
     "paths": {
-      // Alias general para toda la carpeta src, para imports tipo '@/...'
-      "@/*": [
-        "src/*"
-      ],
-      // Alias específicos para los wrappers/componentes dentro de components/ui
-      "@radix-ui/react-accordion": [
-        "src/components/ui/accordion.tsx"
-      ],
-      "@radix-ui/react-alert-dialog": [
-        "src/components/ui/alert-dialog.tsx"
-      ],
-      "@radix-ui/react-alert": [
-        "src/components/ui/alert.tsx"
-      ],
-      "@radix-ui/react-aspect-ratio": [
-        "src/components/ui/aspect-ratio.tsx"
-      ],
-      "@radix-ui/react-avatar": [
-        "src/components/ui/avatar.tsx"
-      ],
-      "@radix-ui/react-badge": [
-        "src/components/ui/badge.tsx"
-      ],
-      "@radix-ui/react-breadcrumb": [
-        "src/components/ui/breadcrumb.tsx"
-      ],
-      "@radix-ui/react-button": [
-        "src/components/ui/button.tsx"
-      ],
-      "@radix-ui/react-calendar": [
-        "src/components/ui/calendar.tsx"
-      ],
-      "@radix-ui/react-card": [
-        "src/components/ui/card.tsx"
-      ],
-      "@radix-ui/react-carousel": [
-        "src/components/ui/carousel.tsx"
-      ],
-      "@radix-ui/react-chart": [
-        "src/components/ui/chart.tsx"
-      ],
-      "@radix-ui/react-checkbox": [
-        "src/components/ui/checkbox.tsx"
-      ],
-      "@radix-ui/react-collapsible": [
-        "src/components/ui/collapsible.tsx"
-      ],
-      "@radix-ui/react-command": [
-        "src/components/ui/command.tsx"
-      ],
-      "@radix-ui/react-context-menu": [
-        "src/components/ui/context-menu.tsx"
-      ],
-      "@radix-ui/react-dialog": [
-        "src/components/ui/dialog.tsx"
-      ],
-      "@radix-ui/react-drawer": [
-        "src/components/ui/drawer.tsx"
-      ],
-      "@radix-ui/react-dropdown-menu": [
-        "src/components/ui/dropdown-menu.tsx"
-      ],
-      "@radix-ui/react-form": [
-        "src/components/ui/form.tsx"
-      ],
-      "@radix-ui/react-hover-card": [
-        "src/components/ui/hover-card.tsx"
-      ],
-      "@radix-ui/react-input-otp": [
-        "src/components/ui/input-otp.tsx"
-      ],
-      "@radix-ui/react-input": [
-        "src/components/ui/input.tsx"
-      ],
-      "@radix-ui/react-label": [
-        "src/components/ui/label.tsx"
-      ],
-      "@radix-ui/react-menubar": [
-        "src/components/ui/menubar.tsx"
-      ],
-      "@radix-ui/react-navigation-menu": [
-        "src/components/ui/navigation-menu.tsx"
-      ],
-      "@radix-ui/react-pagination": [
-        "src/components/ui/pagination.tsx"
-      ],
-      "@radix-ui/react-popover": [
-        "src/components/ui/popover.tsx"
-      ],
-      "@radix-ui/react-progress": [
-        "src/components/ui/progress.tsx"
-      ],
-      "@radix-ui/react-radio-group": [
-        "src/components/ui/radio-group.tsx"
-      ],
-      "@radix-ui/react-resizable": [
-        "src/components/ui/resizable.tsx"
-      ],
-      "@radix-ui/react-scroll-area": [
-        "src/components/ui/scroll-area.tsx"
-      ],
-      "@radix-ui/react-select": [
-        "src/components/ui/select.tsx"
-      ],
-      "@radix-ui/react-separator": [
-        "src/components/ui/separator.tsx"
-      ],
-      "@radix-ui/react-sheet": [
-        "src/components/ui/sheet.tsx"
-      ],
-      "@radix-ui/react-sidebar": [
-        "src/components/ui/sidebar.tsx"
-      ],
-      "@radix-ui/react-skeleton": [
-        "src/components/ui/skeleton.tsx"
-      ],
-      "@radix-ui/react-slider": [
-        "src/components/ui/slider.tsx"
-      ],
-      "@radix-ui/react-sonner": [
-        "src/components/ui/sonner.tsx"
-      ],
-      "@radix-ui/react-switch": [
-        "src/components/ui/switch.tsx"
-      ],
-      "@radix-ui/react-table": [
-        "src/components/ui/table.tsx"
-      ],
-      "@radix-ui/react-tabs": [
-        "src/components/ui/tabs.tsx"
-      ],
-      "@radix-ui/react-textarea": [
-        "src/components/ui/textarea.tsx"
-      ],
-      "@radix-ui/react-toast": [
-        "src/components/ui/toast.tsx"
-      ],
-      "@radix-ui/react-toaster": [
-        "src/components/ui/toaster.tsx"
-      ],
-      "@radix-ui/react-toggle-group": [
-        "src/components/ui/toggle-group.tsx"
-      ],
-      "@radix-ui/react-toggle": [
-        "src/components/ui/toggle.tsx"
-      ],
-      "@radix-ui/react-tooltip": [
-        "src/components/ui/tooltip.tsx"
-      ],
-      "@radix-ui/react-use-mobile": [
-        "src/components/ui/use-mobile.tsx"
-      ],
-      "@radix-ui/react-use-toast": [
-        "src/components/ui/use-toast.ts"
-      ]
+      "@/*": ["frontend/*"]                // Alias '@' apunta a la carpeta 'src'
     },
     "plugins": [
-      {
-        "name": "next"
-      }
+      { "name": "next" }
     ]
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "next-env.d.ts",
     ".next/types/**/*.ts"
-  ], // Archivos que usa TS
+  ],
   "exclude": [
     "node_modules"
-  ] // Ignorar node_modules
+  ]
 }

@@ -209,5 +209,3 @@ export async function fetchMediaById(mediaId: string): Promise<MediaItem | null>
     throw new Error(`Error en fetchMediaById: ${error}`);
   }
 }
-
-

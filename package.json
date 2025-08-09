@@ -1,25 +1,18 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "my-fullstack-app",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "date-fns": "3.6.0",
-    "react-day-picker": "8.10.1",
-    "next": "15.2.4",
-    "clsx": "^2.1.1",
-    "react-hook-form": "^7.54.1"
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build": "npm run build:frontend && npm run build:backend",
+    "start:frontend": "cd frontend && npm run start",
+    "start:backend": "cd backend && npm run start"
   },
   "devDependencies": {
-    "@types/react": "18.0.37",
-    "@types/react-dom": "18.0.11",
-    "typescript": "^5"
+    "concurrently": "^7.6.0"
   }
 }
