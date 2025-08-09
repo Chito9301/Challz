@@ -1,22 +1,22 @@
 {
   "compilerOptions": {
-    "target": "esnext",                // Usar la última versión estándar de JS soportada
-    "lib": ["dom", "dom.iterable", "esnext"],  // Librerías para DOM y ESNext
-    "allowJs": true,                   // Permitir archivos JavaScript junto a TS
-    "skipLibCheck": true,              // Saltar chequeo estricto en librerías para acelerar build
-    "strict": true,                   // Activar reglas estrictas de TS
-    "forceConsistentCasingInFileNames": true, // Mayúsculas y minúsculas consistentes en imports
-    "noEmit": true,                   // No emitir salida JS (Next.js maneja esto)
-    "esModuleInterop": true,          // Mejor interoperabilidad con módulos CommonJS
-    "module": "esnext",               // Usar módulos ESNext (import/export)
-    "moduleResolution": "node",       // Resolución de módulos estilo Node.js
-    "resolveJsonModule": true,         // Permitir importar archivos JSON
-    "isolatedModules": true,           // Tratar cada archivo como módulo independiente
-    "jsx": "preserve",                 // Dejamos JSX para que Next.js/Babel lo transforme
-    "incremental": true,               // Compilación incremental para acelerar sucesivas builds
-    "baseUrl": ".",                   // Directorio base para resolver módulos y alias
+    "target": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["frontend/*"]                // Alias '@' apunta a la carpeta 'src'
+      "@/*": ["./*"]
     },
     "plugins": [
       { "name": "next" }
