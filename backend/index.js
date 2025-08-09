@@ -61,6 +61,7 @@ app.use(express.json());
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
+  // Extrae token del header: Authorization: Bearer <token>
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Token requerido' });
 
@@ -89,7 +90,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true,
 });
 
-// Obtenemos la conexión para eventos
+// Evento para manejar conexión a MongoDB
 const db = mongoose.connection;
 db.on('error', (error) => console.error('Error de conexión a MongoDB:', error));
 db.once('open', () => console.log('Conectado a MongoDB correctamente'));
@@ -236,7 +237,7 @@ app.post(
   }
 );
 
-// Ruta para registrar metadata después de que archivo ya esté subido a Cloudinary
+// Ruta para registrar metadata después de que archivo esté subido a Cloudinary
 app.post('/api/media/register', authMiddleware, async (req, res) => {
   try {
     const {
