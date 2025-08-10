@@ -1,23 +1,22 @@
-import { ImageResponse } from "next/og"
-import { AppIcon } from "@/components/app-icon"
+// frontend/app/icon.tsx
+import { ImageResponse } from "next/og";
+import { AppIcon } from "@/components/app-icon"; // Este debe tener export nombrado AppIcon
 
-// Route segment config
-export const runtime = "edge"
+export const runtime = "edge";
 
-// Image metadata
 export const size = {
   width: 32,
   height: 32,
-}
-export const contentType = "image/png"
+};
 
-// Re-export AppIcon for backward compatibility
-export { AppIcon }
+export const contentType = "image/png";
 
-// Image generation
+// Re-exporta AppIcon para compatibilidad o uso en otras partes
+export { AppIcon };
+
+// Imagen de app icon generada dinámicamente con ImageResponse
 export default function Icon() {
   return new ImageResponse(
-    // ImageResponse JSX element
     <div
       style={{
         fontSize: 24,
@@ -33,11 +32,8 @@ export default function Icon() {
     >
       C
     </div>,
-    // ImageResponse options
     {
-      // For convenience, we can re-use the exported icons size metadata
-      // config to also set the ImageResponse's width and height.
       ...size,
-    },
-  )
+    }
+  );
 }
