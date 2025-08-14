@@ -1,34 +1,48 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    /* Soporte de ES moderno y navegadores */
+    "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
+
+    /* Imports y módulos */
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Alias @ para imports absolutos */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     },
-    "plugins": [
-      { "name": "next" }
-    ]
+
+    /* TypeScript estricto */
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* JS, JSX y React */
+    "allowJs": true,
+    "jsx": "preserve",
+    "jsxImportSource": "react",
+
+    /* Utilidad */
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "noEmit": true,
+
+    /* Plugin Next.js para TS */
+    "plugins": [{ "name": "next" }]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    ".eslintrc.js",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

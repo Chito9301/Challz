@@ -85,10 +85,7 @@ app.get('/', (req, res) => {
 // Conexión a MongoDB
 // =======================
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(process.env.MONGODB_URI)  // Eliminadas opciones obsoletas
 
 // Evento para manejar conexión a MongoDB
 const db = mongoose.connection;
